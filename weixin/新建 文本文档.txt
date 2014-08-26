@@ -1,0 +1,3 @@
+http://mp.weixin.qq.com/mp/getmasssendmsg?__biz=MzA4MzEwMzIxNA==&uin=MzQ0MDY4ODU%3D&key=c4f3a13b9b1b95fff21142bceb57a00c1674d1dea3692a2d8f085e8733e0799215e5b09da795ebce7fa7fe760dc10115&devicetype=webwx&version=70000001&lang=zh_CN&pass_ticket=g057zuFSa0NduoLcBGFMo3z3tcqi1QA1UIviD6S3Q2U%3D#wechat_webview_type=1
+
+http://mp.weixin.qq.com/mp/getmasssendmsg?__biz=MzA4MzEwMzIxNA==#wechat_webview_type=1&wechat_redirect

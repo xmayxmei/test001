@@ -1,0 +1,48 @@
+--用户信息（个人基本，交友基本）
+create table users(
+	user_id int identity (1,1) primary key,  
+	openid varchar(50), --用户的标识，对当前公众号唯一
+	nickname varchar(20), --	 用户的昵称
+	sex varchar(20), --	 用户的性别，值为1时是男性，值为2时是女性，值为0时是未知
+	city varchar(20), --	 用户所在城市
+	country varchar(20), --	 用户所在国家
+	province varchar(20), --	 用户所在省份
+	language varchar(20), --	 用户的语言，简体中文为zh_CN
+	headimgurl varchar(50), --	 用户头像
+	subscribe_time varchar(20), --	 用户关注时间，为时间戳。如果用户曾多次关注，则取最后关注时间
+	unionid varchar(20), --	 只有在用户将公众号绑定到微信开放平台帐号后，才会出现该字段。
+	status varchar(1), -- (0未关注，1已关注，2隐身，3删除)
+);
+
+--用户资料（图片、视频、语音、地理位置）
+create table resource(
+ 	res_id int identity (1,1) primary key, --资源ID
+	-- 资源所属人	
+	varchar(50), --	 上传时间
+ 	varchar(50), --	 资源类型
+ 	varchar(50), --	资源路径
+ 	varchar(50), --	状态
+ 	
+);
+--订单（）
+create table order(
+	order_id int identity (1,1) primary key,
+	customer_id int -- 客户
+	vendor_id int , --（供应人）
+	status varchar(1),--状态(0新单，1已审核，2已拒绝，3已取消，4已接受，5已暂停，6进行中，7已结束。)
+	order_time datetime,
+	start_time datetime,
+	end_time datetime,
+);
+--上下行（关联订单）
+create table a(
+	 int identity (1,1) primary key,
+	
+);
+
+create table dict_code(
+	id,
+	name,
+	parent_path;
+	value,
+)
