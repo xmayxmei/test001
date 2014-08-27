@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t2sdk-configuration>
+	<performance   heartbeatTime="400"
+		           acquireConnWaitTime="3000"  registerTime="5" reconnInterval="3"
+		           localServerName="mctest"   callBackTime="5000" enmCompress="true" />
+    <parents>    
+		<parent  parentName="mcserver" safeLevel="NONE">
+			<limit licenseFile="c:\Hundsun\HsAdmin\Bin\FBaseAdmin\Config\client_license.dat" encrypt="HSBlowfish" />
+			<members>
+				<member no="5" address="192.168.94.24" port="9008"
+				  charset="gbk" poolSize="1" />
+			</members>
+		</parent>
+	</parents>
+	<callBackMethods>
+		<!--  消息中心的回调必须增加这一项  -->
+		<method id="-1" className="com.hundsun.mcapi.MCT2sdkCallback" />
+	</callBackMethods>
+	<logAdapter className="com.hundsun.t2sdk.impl.util.CommonLogAdapter" />
+	
+	<!--  消息中心必须增加下面的配置，否则无法订阅  -->
+	<!--  parentName：上级连接名字  cachedir：本地缓存的消息目录 inittimeout：初始化的超时时间   -->
+	<!--  type：1只完成订阅，2只发布 0既能订阅也能发布   -->
+
+	<mc parentName="mcserver" type="0" cachedir="D:/mc" inittimeout="3000">
+
+		<!--  订阅者信息配置  -->
+		<!--  subname：订阅者名字  subcallback：订阅者的回调类，必须有，否则构造失败 timeout：订阅者的初始化超时时间   -->
+		<subscriber  subname="xuxp"  subcallback="test.mctestcallback"  timeout="3000"/>
+	
+		<!--  发布者信息配置  -->
+		<!--  msgCount：本地缓存的消息数量  -->
+		<publisher pubname="xuxp" msgCount="200" isResetNo="false"/>
+	
+		<!--  mc日志目录配置  -->
+		<mclog dir="D:\mclog"/>
+	</mc> 
+</t2sdk-configuration>

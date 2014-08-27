@@ -1,0 +1,295 @@
+﻿<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset='utf-8'>
+		<meta name='viewport' content='width = device-width, minimum-scale = 1.0, maximum-scale = 1.0, user-scalable = 1.0'>
+		<title>股票持仓</title>
+        <link rel="stylesheet" type="text/css" href="public/css/base${compressSuffix}.css?${version}">
+	</head>
+	<style type="text/css">
+		*{
+			margin: 0;
+			padding: 0;
+			text-align: center;
+			font-size: 14px;
+			font-family: '微软雅黑';
+		}
+        body {
+            
+        }
+		.body{
+			
+		}
+		li{
+			height: 40px;
+			color: #333;
+		}
+		ul{
+			list-style: none;
+		}
+		.ticket-name-column{
+			position:absolute;
+			z-index: 2;
+			box-shadow: 1px 0px 2px 0 #cccccc;
+		}
+		.ticket-name-column li{
+			width: 100%;
+			min-width: 100px;
+			/*color: #333;*/
+			line-height: 30px;
+		}
+        .info-scroller {
+            min-width: 900px;
+        }
+        .ticket-info ul {
+            width: 100%;
+        }
+		li:nth-child(2n){
+			background: white;
+		}
+		li:nth-child(2n+1){
+			background: #f6f6f6;
+		}
+        .ticket-info li > div {
+            width: 11.11%;
+            float: left;
+            height: 40px;
+            overflow: hidden;
+        }
+        .ticket-info li.ticket-info-header {
+            background: #259cd8;
+            color: white;
+        }
+
+        .ticket-info li {
+            line-height: 40px;
+        }
+		.ticket-name{
+			line-height: 30px;
+			height: 25px;
+		}
+		.ticket-code{
+			line-height: 10px;
+			height: 15px;
+			font-size: 12px;
+			color: #999;
+		}
+		.up{
+			color: #f00;
+		}
+		.down{
+			color: #80bc00;
+		}
+		.err {
+			color: red;
+		}
+        .data-wrapper {
+            position:absolute;
+            top:45px;
+            bottom:0;
+            left:0;
+            right:0;
+        }
+        .data-scroller {
+            min-height:100%;
+        }
+	</style>
+	<body>
+		<div class='body'>
+            <div class="nav">
+                <div class="tab">
+                    <span>股票持仓</span>
+                    <div class="btn-back" onclick="top.location.href = '${rc.getContextPath()}/homePage.do?page=2'">返回</div>
+                </div>
+            </div>
+            <div class="data-wrapper" id='data-wrapper'>
+                <div class="data-scroller">
+                    <div class="idle" id='pullDown'>
+                        <span class="pullDownIcon"></span>
+                        <div class="right">
+                            <span class="pullDownLabel">下拉可以刷新</span>
+                            <span class="timeLabel">数据下载于:</span>
+                        </div>
+                    </div>
+                    <ul class="ticket-name-column">
+                        <li style='background: #2265a3;color: white;line-height:40px;'>我的持仓</li>
+                    </ul>
+                    <div class="info-wrapper" id="info-wrapper">
+                        <div class='info-scroller'>
+                            <ul class="ticket-info">
+                                <li class='ticket-info-header'>
+                                    <div>&nbsp;</div>
+                                    <div>股票余额</div>
+                                    <div>可卖数量</div>
+                                    <div>成本价</div>
+                                    <div>最新价</div>
+                                    <div>市值</div>
+                                    <div>买卖盈亏</div>
+                                    <div>股东账号</div>
+                                    <div>证券市场</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="idle" id='pullUp'>
+                        <span class="pullUpIcon"></span>
+                        <div class="right">
+                            <span class="pullUpLabel">上拉显示下一页</span>
+                            <span class="timeLabel">数据下载于:</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</body>
+<script type="text/javascript" src="public/js/zepto.min.js?${version}"></script>
+<script type="text/javascript" src="public/js/iscroll.min.js?${version}"></script>
+	<script type="text/javascript">
+		
+		document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
+		var myScroll, iscroller, pullDownEl, pullDownOffset, pullUpEl, pullUpOffset, maxScrollY;
+
+		pullDownEl = document.getElementById('pullDown');
+		pullDownOffset = pullDownEl.offsetHeight;
+		pullUpEl = document.getElementById('pullUp');
+		pullUpOffset = pullUpEl.offsetHeight;
+
+		function loadScroll() {
+		    myScroll = new iScroll('data-wrapper', {
+		        vScrollbar: false,
+		        hScrollbar: false,
+		        useTransition: true,
+		        topOffset: pullDownOffset,
+		        lockDirection: true,
+		        bounce: true,
+		        //snap: 'li',
+		        onRefresh: function () {
+		            var now = new Date;
+		            var dateText = [now.getMonth() + 1, '-', now.getDate(), ' ', now.getHours(), ':', now.getMinutes(), ':', now.getSeconds()].join('');
+		            $('.timeLabel').text('数据下载于:' + dateText);
+		            if ($(pullDownEl).hasClass('loading')) {
+		                pullDownEl.className = 'idle';
+		                $('.pullDownLabel').text('下拉可以刷新');
+		                this.minScrollY = -pullDownOffset;
+		            } else if ($(pullUpEl).hasClass('loading')) {
+		                pullUpEl.className = 'idle';
+		                $('.pullUpLabel').innerHTML = '上拉加载下一页';
+		            }
+		        },
+		        onScrollMove: function () {
+		            $('#outhtml').html('a' + $('#pullDown').attr('class'));
+		            if (this.y > 5 && !$(pullDownEl).hasClass('flip')) {
+		                $('.pullDownLabel').text('松手刷新页面……');
+		                $(pullDownEl)[0].className = 'flip';
+		                this.minScrollY = 0;
+
+		            } else if (this.y < 5 && $(pullDownEl).hasClass('flip')) {
+		                $(pullDownEl)[0].className = 'idle';
+		                $('.pullDownLabel').text('下拉可以刷新');
+		                this.minScrollY = -pullDownOffset;
+		            }
+		            if (this.y < (maxScrollY - pullUpOffset - 5) && !$(pullUpEl).hasClass('flip')) {
+		                $('.pullUpLabel').text('松手加载下一页……');
+		                $(pullUpEl)[0].className = 'flip';
+		                this.maxScrollY = this.maxScrollY - pullUpOffset;
+
+		            } else if (this.y > (maxScrollY - pullUpOffset - 5) && $(pullUpEl).hasClass('flip')) {
+		                $('.pullUpLabel').text('上拉加载下一页');
+		                $(pullUpEl)[0].className = 'idle';
+		                this.maxScrollY = maxScrollY;
+		            }
+		        },
+		        onScrollEnd: function () {
+		            if ($(pullDownEl).hasClass('flip')) {
+		                $(pullDownEl)[0].className = 'loading';
+		                $('.pullDownLabel').text('正在刷新中……');
+		                searchData(1, false);
+
+		            } else if ($(pullUpEl).hasClass('flip')) {
+		                $(pullUpEl)[0].className = 'loading';
+		                $('.pullUpLabel').text('正在加载中……');
+		                searchData(false, false);
+		            }
+		        }
+		    });
+
+		    myScroll.maxScrollY = myScroll.maxScrollY + pullUpOffset;
+
+		    iscroller = new iScroll('info-wrapper', {
+		        vScroll: false,
+		        vScrollbar: false,
+		        hScrollbar: false
+		    });
+		}
+
+		var url = '${rc.getContextPath()}/holdStock.do';
+		var position_str = '', pagasize = 10;
+		function searchData(curPage, firstLoad) {
+		    if (curPage && curPage <= 1) {
+		        position_str = '';
+		    }
+		    var data = {
+		        request_num: pagasize,
+		        position_str: position_str
+		    };
+		    var ticketNameTpl = '<li><div class="ticket-name">$name</div><div class="ticket-code">$code</div></li>';
+		    var ticketInfoTpl = '<li>' + '<div>&nbsp;</div>' + '<div>$qty</div>' + '<div>$totalSellEnable</div>' + '<div>$costPrice</div>' + '<div>$lastPrice</div>' + '<div>$marketVal</div>' + '<div>$totalPL</div>' + '<div>$shareholder</div>' + '<div>$exchange</div>' + '</li>';
+		    $.ajax({
+		        type: 'post',
+		        url: url,
+		        data: data,
+		        dataType: 'json',
+		        beforeSend: function () {
+		            if (firstLoad) {
+		                pullDownEl.className = 'loading';
+		                $('.pullDownLabel').text('正在刷新中……');
+		            }
+		            myScroll && myScroll.disable();
+		        },
+		        success: function (_data, status, xhr) {
+		            if (_data && _data.errMsg == '' && _data.data) {
+		                $('.ticket-name-column').html($('.ticket-name-column li').get(0).outerHTML);
+		                $('.ticket-info').html($('.ticket-info li').get(0).outerHTML);
+		                $.each(_data.data, function (key, value) {
+		                    $('.ticket-name-column').append(ticketNameTpl.replace(/\$name/, value[0]).replace(/\$code/, value[1]));
+		                    $('.ticket-info').append(ticketInfoTpl.replace(/\$qty/, value[2]).replace(/\$totalSellEnable/, value[3]).replace(/\$costPrice/, value[4]).replace(/\$lastPrice/, value[5]).replace(/\$marketVal/, value[6]).replace(/\$totalPL/, value[7]).replace(/\$shareholder/, value[8]).replace(/\$exchange/, value[9]));
+		                });
+		                position_str = _data.positionStr;
+		                if (firstLoad) {
+		                    loadScroll();
+		                }
+		                myScroll.refresh();
+		                myScroll.maxScrollY = myScroll.maxScrollY + pullUpOffset;
+		                maxScrollY = myScroll.maxScrollY;
+		                myScroll.scrollTo(0, 0);
+		            }
+		            myScroll && myScroll.enable();
+		        }
+		    });
+		}
+
+		document.addEventListener('DOMContentLoaded', function () {
+		    $(document).ready(function () {
+		        $('.info-scroller').css('min-height', $(window).height() - 45);
+		        var h = $(window).height();
+		        if (h >= 1024) {
+		            pagasize = 50;
+		        }
+		        else if (h >= 960) {
+		            pagasize = 30;
+		        }
+		        else if (h >= 640) {
+		            pagasize = 25;
+		        }
+		        else if (h >= 480) {
+		            pagasize = 16;
+		        }
+		        else if (h >= 320) {
+		            pagasize = 12;
+		        }
+		        searchData(1, true);
+		    });
+		}, false);
+	</script>
+</html>

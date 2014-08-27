@@ -1,0 +1,1 @@
+这个demo工程需要导入C#目录的c#的库ext_t2sdkEx.dll，同时运行的时候还需要win32\lib目录下C++的t2sdk.dll。

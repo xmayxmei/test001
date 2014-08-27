@@ -1,0 +1,197 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+    <style type="text/css" media="all">
+        body {
+            background: #DADFE4;
+            font-family: '微软雅黑';
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .news_wraper {
+            width: 100%;
+        }
+
+        .news_header {
+            padding: 18px;
+            text-align: left;
+            border-bottom: 1px solid #A4B0BB;
+        }
+        .news_title {
+            color: #3E4751;
+            font-size: 18px;
+            line-height: 200%;
+            font-weight: bold;
+        }
+        .news_time {
+            color: #566373;
+            font-size: 12px;
+            line-height: 200%;
+        }
+        .news_content {
+            padding: 20px 15px;
+            text-align: left;
+            color: #3E4751;
+            line-height: 250%;
+            border-top: 1px solid #F6F7F9;
+            text-indent: 2em;
+        }
+        @media only screen and (max-height:480px) {
+            .news_header {
+                padding: 8px 10px;
+            }
+
+            .news_content {
+                padding: 10px 10px;
+                line-height: 200%;
+            }
+        }
+        .footer, .editfooter {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #1a2027;
+            -webkit-box-shadow: 0 -1px 30px 3px rgba(0,0,0,0.6);
+            -moz-box-shadow: 0 -1px 30px 3px rgba(0,0,0,0.6);
+            box-shadow: 0 -1px 30px 3px rgba(0,0,0,0.6);
+            z-index: 2;
+        }
+
+            .footer > div, .editfooter > div {
+                float: left;
+                text-align: center;
+            }
+
+            .footer > div {
+                width: 33.33%;
+            }
+
+            .editfooter > div {
+                width: 50%;
+            }
+
+                .footer > div div, .editfooter > div div {
+                    line-height: 40px;
+                    font-size: 16px;
+                    border-top: 1px solid #2E3741;
+                    color: #7A8593;
+                }
+
+            .footer > div > a {
+                display: block;
+                border-top: 1px solid #2E3741;
+                line-height: 40px;
+                font-size: 16px;
+                text-decoration: none;
+            }
+
+            .footer > div div.selected, .editfooter > div div.selected, .footer > div a.selected {
+                border-top: 1px solid #2E88CE;
+                background-color: #2A84CA;
+                -webkit-box-shadow: inset 1px 1px 30px rgba(0,0,0,0.6);
+                -moz-box-shadow: inset 1px 1px 30px rgba(0,0,0,0.6);
+                box-shadow: inset 1px 1px 30px rgba(0,0,0,0.6);
+                color: #fff;
+            }
+
+        .zixuan span.icon, .zhzx span.icon, .market span.icon {
+            background: url("../images/icons.png") no-repeat scroll 0px -141px rgba(0, 0, 0, 0);
+            background-size: 91px;
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .zixuan span.icon {
+            background-position: 0px -20px;
+        }
+
+        .selected.zixuan span.icon {
+            background-position: -33px -20px;
+        }
+
+        .zhzx span.icon {
+            background-position: 0px -79px;
+        }
+
+        .selected.zhzx span.icon {
+            background-position: -33px -79px;
+        }
+
+        .market span.icon {
+            background-position: 0px -50px;
+        }
+
+        .selected.market span.icon {
+            background-position: -33px -50px;
+        }
+    </style>
+    <title>资讯</title>
+</head>
+
+<body>
+    <div class="news_wraper">
+        <div class="news_header">
+            <div class="news_title"></div>
+            <div class="news_time"></div>
+        </div>
+        <div class="news_content">加载中……</div>
+    </div>
+    <footer class="footer">
+        <div><div class="zixuan"><span class="icon"></span>自选</div></div>
+        <div><div class="market"><span class="icon"></span>行情</div></div>
+        <div><a href="javascript:void(0);" class="zhzx selected"><span class="icon"></span>资讯</a></div>
+    </footer>
+    <script src="../js/zepto.min.js" language="javascript" type="text/javascript"></script>
+    <script type="text/javascript">
+        function getNewsId() {
+            var s = location.search && location.search.slice(1),
+            arr = s.split('&'),
+            item = [],
+            obj = {};
+            for (var i = 0; i < arr.length; i++) {
+                item = arr[i].split('=');
+                obj[item[0]] = item[1];
+            }
+            if ('newsid' in obj) {
+                return obj['newsid'].slice(0);
+            }
+        }
+        $(function () {
+            $.ajax({
+                type: 'post',
+                url: '../../jynews/ajaxShowNews.do',
+                data: {
+                    'id': getNewsId()
+                },
+                dataType: 'json',
+                success: function (d) {
+                    var colEntity = null;
+                    if (d.news != null) {
+                        for (var i = 0; i < d.news.length; i++) {
+                            var entity = d.news[i];
+                            if (null != entity) {
+                                $(".news_title").html(entity.infotitle);
+                                $(".news_time").html(entity.infopubldate);
+                                $(".news_content").html(entity.content);
+                            }
+                        }
+                    }
+                }
+            });
+
+            $('.market').click(function () {
+                window.location.href = '../../index.html';
+            })
+            $('.zixuan').click(function () {
+                window.location.href = '../../index.html?zixuan=1';
+            })
+        })
+    </script>
+</body>
+</html>

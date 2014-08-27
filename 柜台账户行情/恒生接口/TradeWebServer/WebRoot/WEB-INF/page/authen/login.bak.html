@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+<title>登录</title>
+<link rel="stylesheet" type="text/css" href="public/css/base.css">
+<link rel="stylesheet" type="text/css" href="public/css/login/login.css">
+<link href="public/css/bottom.css" rel="stylesheet" />
+<style type="text/css">
+	#errMsg{
+		font-size:15px;
+	}
+	div.main div:nth-child(2){
+		margin-top:0px;
+	}
+	.show{
+		opacity:1;
+		-webkit-transition:opacity 0s;
+		-moz-transition:opacity 0s;
+		-o-transition:opacity 0s;
+		transition:opacity 0s;
+	}
+	.hide{
+		opacity:0;
+		-webkit-transition:opacity 5s;
+		-moz-transition:opacity 5s;
+		-o-transition:opacity 5s;
+		transition:opacity 5s;
+	}
+	.main{
+		padding-bottom:30px;
+	}
+</style>
+</head>
+<body id="pagelogin">
+    <div class="logo">
+		<img src="public/img/logo.png">
+    </div>
+	<form id="frmLogin" method="post" action="${rc.getContextPath()}/loginAuthen.do">
+		<div class="main">
+			<div id="errMsg">
+      <#if errMsg??>
+				${errMsg}
+			</#if>
+      </div>
+			<div class="outter select-right">
+				<img class="prefix" src="public/img/icon01.png"> 
+				<select name="loginType" id="loginType" class="select-def pad-left40 rel">
+					<option selected="selected" value="1">资金账号</option>
+					<option value="2">深证A股</option>
+					<option value="3">上证A股</option>
+				</select>
+			</div>
+			<div class="outter">
+				<img class="prefix" src="public/img/icon02.png"> 
+				<input id="account_content" name="account_content" placeholder="请输入账号" maxlength="50" class="input-def pad-left45" type="text">
+			</div>
+			<div class="outter">
+				<img class="prefix" src="public/img/icon03.png"> 
+				<input id="password1" name="password1" placeholder="请输入密码" maxlength="50" class="input-def pad-left45" type="password">
+				<input id="password" name="password" type="hidden">
+			</div>
+			<div class="outter">
+				<div class="inner">
+					<img class="prefix" src="public/img/icon04.png"> 
+					<input id="captcha" name="captcha" maxlength="4" placeholder="请输入验证码" class="input-def pad-left45" type="text">
+				</div>
+				<img src="" id="imgCaptcha" class="validcode"> 
+			</div>
+			<div class="outter">
+				<input name="url" id="url" value="${url}" type="hidden">
+				<input name="loginType" id="loginType" value="1" type="hidden">
+				<input value="登录" id="login" name="login" class="btn-def btn-submit" type="button">
+			</div>
+            <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+		</div>
+		</form>
+    <#include "../common/bottom.html">
+</body>
+<script type="text/javascript" src="public/js/zepto.min.js"></script>
+<script type="text/javascript" src="public/js/Common/jMessage.js"></script>
+<script type="text/javascript" src="public/js/Common/security.js"></script>
+<script>
+var host = "${rc.getContextPath()}";
+var md = "${md!""}";
+var exp = "${exp!""}";
+
+function validateForm(){
+	var ologinType = $('#loginType'),oAccountContent = $('#account_content'),opassword = $('#password1'),ocaptcha = $('#captcha');
+	if(ologinType[0].selectedIndex <= -1){
+		jMessage.open({title: '', content: '请选择帐号类型', model: 'alert', autoHide: true, top: 160});
+		//ologinType.focus();
+		return false;
+	}
+	if(oAccountContent.val().length<1 || oAccountContent.val() == "请输入帐号"){
+		jMessage.open({title: '', content: '请输入帐号', model: 'alert', autoHide: true, top: 160});
+		//oAccountContent.focus();
+		return false;
+	}
+	if(opassword.val().length<1){
+		jMessage.open({title: '', content: '请输入密码', model: 'alert', autoHide: true, top: 160});
+		//opassword.focus();
+		return false;
+	}
+	if(ocaptcha.val().length<1 || ocaptcha.val() == "请输入验证码"){
+		jMessage.open({title: '', content: '请输入验证码', model: 'alert', autoHide: true, top: 160});
+		//ocaptcha.focus();
+		return false;
+	}
+	return true;
+}
+
+function freshCaptcha() {
+	$("#imgCaptcha").attr("src", host + "/captcha.do?" + new Date().toString());
+}
+
+$(function() {
+	var tap = 'click';
+	if('ontouchend' in document.createElement('div')){
+		tap = 'touchend';
+	}
+	freshCaptcha();
+	$("#imgCaptcha").on(tap, function() {
+		freshCaptcha();
+	});
+	$("#login").on(tap, function() {
+		if(validateForm()){
+			$("#password").val($('#password1').val());
+			$('#password1').val('');
+			if (exp != "" && md != "") {
+				var key = RSAUtils.getKeyPair(exp, '', md);
+				var psw = $("#password").val();
+				$("#password").val(RSAUtils.encryptedString(key, psw));
+			}
+			$("#frmLogin").submit();
+		}
+	});
+	if($.trim($("#errMsg").html()).length < 1){
+		$("#errMsg").hide();
+	}
+	else{
+		$("#errMsg").addClass("show");
+		setTimeout(function(){$("#errMsg").addClass("hide")}, 500);
+	}
+	
+	if(!('placeholder' in document.createElement('input'))){
+		$('#account_content').val('请输入账号')
+		.bind({
+			'focus': function(){
+				if($(this).val() == '请输入账号' ){
+					$(this).val('');
+				}
+			},
+			'blur': function(){
+				if($.trim($(this).val()) == '' ){
+					$(this).val('请输入账号');
+				}
+			}
+		});
+		
+		$('#captcha').val('请输入验证码')
+		.bind({
+			'focus': function(){
+				if($(this).val() == '请输入验证码' ){
+					$(this).val('');
+				}
+			},
+			'blur': function(){
+				if($.trim($(this).val()) == '' ){
+					$(this).val('请输入验证码');
+				}
+			}
+		});
+	}
+});
+</script>
+</html>

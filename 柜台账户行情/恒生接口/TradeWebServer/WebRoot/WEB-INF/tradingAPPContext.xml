@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop-4.0.xsd 
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-4.0.xsd 
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-4.0.xsd 
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd 
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+	<!-- Resolve the ZH messy code -->
+	<bean
+		class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<bean
+					class="org.springframework.http.converter.StringHttpMessageConverter">
+					<constructor-arg>
+						<value>UTF-8</value>
+					</constructor-arg>
+				</bean>
+				<bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
+			</list>
+		</property>
+	</bean>	
+	<!--  Property file load by spring  -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">  
+        <property name="locations">  
+            <value>config/market-server.properties</value>  
+        </property>  
+    </bean>
+	
+	<!-- freemarker config -->
+	<bean id="freemarkerConfig"
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+		<property name="templateLoaderPath" value="/WEB-INF/page/" />
+		<property name="freemarkerSettings">
+			<props>
+				<prop key="defaultEncoding">UTF-8</prop>
+			</props>
+		</property>
+		<property name="freemarkerVariables">
+            <map>
+				<entry key="marketWebServerIp" value="${marketWebServerIp}"/>
+				<entry key="marketWebServerPort" value="${marketWebServerPort}"/>
+				<entry key="marketWebContentPath" value="${marketWebContentPath}"/>
+				<entry key="version" value="${version}"/>
+				<entry key="compressSuffix" value="${compressSuffix}"/>
+            </map>
+        </property>
+	</bean>	
+	<!-- View resolvers can also be configured with ResourceBundles or XML files. 
+		If you need different view resolving based on Locale, you have to use the 
+		resource bundle resolver. -->
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+		<property name="cache" value="false" /> 
+		<property name="suffix" value=".html" />
+		<property name="contentType" value="text/html;charset=UTF-8"></property> 
+		<property name="requestContextAttribute" value="rc"/>
+		<property name="order" value="1"/>
+	</bean>
+	<!-- auto scan Spring components-->
+	<mvc:annotation-driven />
+	<context:component-scan base-package="com.fortune.trading.*" />
+	<!-- AOP -->
+	 <aop:aspectj-autoproxy  proxy-target-class="true" />
+	<!-- 拦截未登录成功的请求 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/*" />
+			<mvc:exclude-mapping path="/login*" />
+			<mvc:exclude-mapping path="/wechatTrade*" />
+			<mvc:exclude-mapping path="/captcha*" />
+			<bean class="com.fortune.trading.interceptor.AuthenticationInterceptor">
+			</bean>
+		</mvc:interceptor>
+		
+		<mvc:interceptor>
+			<mvc:mapping path="/limitBuyPage.do" />
+			<mvc:mapping path="/limitSellPage.do" />
+			<mvc:mapping path="/cancelOrder.do" />
+			<mvc:mapping path="/changePassword.do" />
+			<bean class="com.fortune.trading.interceptor.RandomIdInterceptor">
+			</bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
+	
+	<!-- 交易实现类 -->
+	<!--<bean id="tradeService" class="com.fortune.trading.service.impl.TradeSocketServiceImpl" scope="singleton">
+	</bean>-->
+	<!-- 交易实现类 -->
+	<bean id="tradeService" class="com.fortune.trading.service.impl.TradeServiceImpl" scope="singleton">
+		<property name="charset" value="UTF-8"></property>
+		<property name="hUrls">
+			<map>
+				<entry key="loginAuthen" value="/TradeGateway/loginAuthen"></entry>
+				<entry key="holdStock" value="/TradeGateway/holdStock"></entry>
+				<entry key="queryFunds" value="/TradeGateway/queryZJ"></entry>
+				<entry key="placeOrder" value="/TradeGateway/placeOrder"></entry>
+				<entry key="cancelOrder" value="/TradeGateway/cancelOrder"></entry>
+				<entry key="todayOrder" value="/TradeGateway/todayWt"></entry>
+				<entry key="todayTransaction" value="/TradeGateway/todayCJ"></entry>
+				<entry key="historyTransaction" value="/TradeGateway/historyCJ"></entry>
+				<entry key="historyOrder" value="/TradeGateway/historyWt"></entry>
+				<entry key="quote" value="/TradeGateway/quote"></entry>
+				<entry key="bankToSecurities" value="/TradeGateway/bankToZJ"></entry>
+				<entry key="securitieToBank" value="/TradeGateway/zjToBank"></entry>
+				<entry key="checkFPwd" value="/TradeGateway/checkFPwd"></entry>
+				<entry key="checkTPwd" value="/TradeGateway/checkTPwd"></entry>
+				<entry key="checkTPwdByGDH" value="/TradeGateway/checkTPwdByGDH"></entry>
+				<entry key="modiFPwd" value="/TradeGateway/modiFPwd"></entry>
+				<entry key="modiTPwd" value="/TradeGateway/modiTPwd"></entry>
+				<entry key="queryBankDm" value="/TradeGateway/queryBankDm"></entry>
+				<entry key="queryZJMX" value="/TradeGateway/queryZJMX"></entry>
+				<entry key="queryHistoryZJ" value="/TradeGateway/queryHistoryZJ"></entry>
+				<entry key="fundsNZ" value="/TradeGateway/zjNZ"></entry>
+				<entry key="zqToBankQuery" value="/TradeGateway/zjToBankQuery"></entry>
+				<entry key="zqToBankReQuery" value="/TradeGateway/zjToBankReQuery"></entry>
+				<entry key="userInfo" value="/TradeGateway/userInfo"></entry>
+				<entry key="gdhQuery" value="/TradeGateway/gdhQuery"></entry>
+				<entry key="queryCancleOrder" value="/TradeGateway/queryCancelOrder"></entry>
+				<entry key="queryPeihao" value="/TradeGateway/queryPeihao"></entry>
+				<entry key="queryBallot" value="/TradeGateway/queryBallot"></entry>
+			</map>
+		</property>
+	</bean>
+	<!-- Gateway端返回的消息转换类 -->
+	<bean id="tradeConverter" class="com.fortune.trading.service.impl.HandsunConverter" scope="singleton">
+	</bean>
+	<!-- 视图映射-->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />  
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".html" />
+	</bean>
+</beans>

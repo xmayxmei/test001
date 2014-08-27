@@ -1,0 +1,242 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>指定交易</title>
+    <link rel="stylesheet" href="public/css/base${compressSuffix}.css?${version}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<style type="text/css">
+.ul-pass .btn-def{
+	width:100%;
+}
+.l{
+	float: left;
+}
+.trade-buttons{
+	list-style: none;
+	overflow: hidden;
+	margin-bottom: 10px;
+}
+.trade-buttons li{
+	width: 25%;
+	float: left;
+	text-align: center;
+}
+.form-buttons li{
+	width: 50%;
+}
+.button{
+	line-height: 50px;
+	font-size: 20px;
+	font-weight: 400;
+	border-radius: 8px;	
+	width: 95%;
+	letter-spacing: 4px;
+	background: #3B9AD9;
+	background: -webkit-linear-gradient(top,#3B9AD9, #3183C8);
+	background: -moz-linear-gradient(top,#3B9AD9, #3183C8);
+	background: linear-gradient(top,#3B9AD9, #3183C8);
+	color: #FFF;
+}
+.button:active{
+	background: #3183C8;
+	background: -webkit-linear-gradient(bottom,#3B9AD9, #3183C8);
+	background: -moz-linear-gradient(bottom,#3B9AD9, #3183C8);
+	background: linear-gradient(bottom,#3B9AD9, #3183C8);
+}
+.gray{
+	background: #a1a1a1;
+	background: -webkit-linear-gradient(top,#a1a1a1, #939393);
+	background: -moz-linear-gradient(top,#a1a1a1, #939393);
+	background: linear-gradient(top,#a1a1a1, #939393);
+}
+.gray:active{
+	background: #939393;
+	background: -webkit-linear-gradient(bottom,#a1a1a1, #939393);
+	background: -moz-linear-gradient(bottom,#a1a1a1, #939393);
+	background: linear-gradient(bottom,#a1a1a1, #939393);
+}
+.overlay{
+	display: none;
+	position: absolute;
+	z-index: 20;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0,0,0,0.3);
+}
+.box-title{
+	height: 40px;
+	line-height: 40px;
+	background: url(public/img/bannerback.png);
+	font-size: 14px;
+	font-weight: bold;
+	overflow: hidden;
+	background-size: contain;
+	color: white;
+	padding-left: 2%;
+}
+.out{
+	display: none;
+	position: absolute;
+	width: 300px;
+	/*height: 275px;*/
+	border-radius: 8px;
+	overflow: hidden;
+	background: #FFF;
+	z-index: 30;
+	font-size: 14px;
+	top: 40px;
+	margin: auto;
+	left: 0;
+	right: 0;
+}
+.out li{
+	list-style: none;
+}
+.box-content{
+	line-height: 1.9;
+	padding-left: 5%;
+	padding-top: 5px;
+	font-size: 12px;
+}
+.box-content li.warn{
+	color:red;
+	text-align:center;
+}
+.box-foot{
+	margin-top: 15px;
+}
+.box-foot .button{
+	line-height: 38px;
+	height: 40px;
+	font-size: 15px;
+	width: 90%;
+}
+#alertBox li{
+	width: 90%;
+	margin: auto;
+	float: none;
+}
+.holding-btn, li a {
+	display: inline-block;
+}
+</style>
+</head>
+
+<body>
+	<div class="container">
+  	<form id="formPass" name="formPass" action="${rc.getContextPath()}/specifiedTrade.do" method="post">
+  	  <input type="hidden" name="ranID" value="${ranID}">
+  	  <input type="hidden" name="gdh" value="${gdh}">
+  	  <input type="hidden" name="jys" value="${jys}">
+  	  <input type="hidden" name="jylb" value="${jylb}">
+  	   <input type="hidden" name="wtsl" value="100">
+  	   <input type="hidden" name="wtjg" value="10">
+  	   <input type="hidden" name="ddlx" value="${ddlx}">
+      <ul class="ul-pass">
+        <li class="li-pass">
+          <input id="mm" name="zqdm" type="text" value='799999' readonly maxlength="50" class="input-def">
+        </li> 
+        <li class="li-pass">
+          <button id="btnSubmit" name="btnSubmit" type="button" onClick="submitForm()" class="btn-def btn-submit">提交</button>
+        </li>
+      </ul>
+    </form>
+  </div>
+  <div class='overlay'></div>
+  <div class='out'>
+    <div class='box-title'>
+      交易确认
+    </div>
+    <div class='box-content'>
+      <ul>
+        
+      </ul>
+    </div>
+    <div class='box-foot'>
+      <ul id='confirmBox' class='trade-buttons form-buttons'>
+        <li><a href='javascript:;' class='button' id='sure'>确定</a></li>
+        <li><a href='javascript:;' class='button gray' id='cancel'>取消</a></li>
+      </ul>
+      <ul id='alertBox' class='trade-buttons form-buttons'>
+        <li><a href='javascript:;' class='button'>确定</a></li>
+      </ul>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="public/js/zepto.min.js?${version}"></script>
+<script type='text/javascript' language="javascript">
+var tap = 'click';
+var Box = {
+	el: $('.out'),
+	layer: $('.overlay'),
+	open: function(param){
+		/*
+			{
+				title: string
+				data: []
+				callback: function
+				mode: string
+			}
+		*/
+		var $el = this.el, liHtml= '', top;
+		$el.find('.box-title').html(param['title']);
+		for(var i=0; i<param.data.length; i++){
+			liHtml += '<li>'+param.data[i]+'</li>'
+		}
+		if(param.warning){
+			liHtml += '<li class="warn">警告：'+param.warning+'</li>'
+		}
+		$el.find('.box-content ul').html(liHtml);
+		if(param.mode == 'confirm' /*&& typeof param.callback === 'function'*/){
+			$('#confirmBox').show();
+			$('#alertBox').hide();
+		}else{
+			$('#confirmBox').hide();
+			$('#alertBox').show();
+		}
+		this.closeCallback = null;
+		if(typeof param.callback === 'function'){
+			this.closeCallback = param.callback;
+		}
+		this.layer.show();
+		$el.show();
+		
+		top = $('body').scrollTop()+($(window).height()- $el.height())*0.5;
+	
+		$el.css('top', top+'px');
+		
+	},
+	close: function(){
+		this.el.hide();
+		this.layer.hide();
+		if(typeof this.closeCallback === 'function'){
+			this.closeCallback();
+		}
+	}
+}
+
+$('#sure').bind(tap, function(){
+	$("#formPass").submit();
+	$('#cancel').trigger(tap);
+});
+
+$('#cancel').bind(tap, function(){
+	Box.close();
+});
+
+$('#alertBox a').bind(tap, function(){
+	$('#cancel').trigger(tap);
+});
+
+function submitForm(){
+	Box.open({title: '提示', data: ['确定要提交指令吗?'], mode: 'confirm'});
+	return;
+}
+</script>
+</html>

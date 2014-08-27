@@ -1,0 +1,51 @@
+1:外网地址，海南财富五线信息中心提供的webservice接口，提供证券基本信息以及是否是交易日。非常重要。
+域名：http://www.icfwx.com.cn 
+IP地址：http://59.50.95.63:9999/EjdbWebService.asmx?wsdl
+
+2.linux共享文件映射
+linux 挂载 
+//winserver2003
+mount -t cifs -o username=administrator,password=y2iaciej //172.16.46.96 /usr/weixin/wechat/remote
+挂在后要先到linux下刷新，看下是否有DBF文件存在。
+
+3.基础配置，baseconfig.properties
+##13.文件备份目录ghostlocationString,保存备份文件目录
+ghostLocation=/usr/weixin/wechat/marketcache
+
+备份文件：需要从深圳测试服务器或者现有客户使用的服务器上获取备份文件。
+
+4,开启生产环境配置
+##21.测试环境1(无论是否交易日都会读取最新数据，开发时测试使用)，生产环境0
+test=0，改到0
+
+5.DBF文件目录配置。
+##DBF文件配置为2个行情DBF和一个股票DBF。(股票DFB用于读取涨跌幅上下限，行情DBF读取最新行情)
+##19.上交所行情DBF文件位置，与制定DBF目录相同
+#shdbf=/usr/weixin/wechat/remote/SHOW2003.DBF
+##20.深交所行情DBF文件位置
+#szdbf=/usr/weixin/wechat/remote/SJSHQ.DBF
+##25.深交所股票DBF文件位置
+sjsStockDbf=/usr/weixin/wechat/remote/SJSXXN.DBF
+文件大小写一定要相同
+
+6.分时备份配置(日线文件自动备份，非高峰期自动备份)：
+##12.分时文件是否进行文件备份(0:不备份，1：一分钟备份一次，2：一天备份一次)
+ghost=2
+该选项根据系统性能配置，如果追求数据，可以选择2.系统性能很好，可以选择1.
+
+7.tomcat内存配置
+JAVA_OPTS='-Xmx2048m -Xms512m -XX:MaxNewSize=512m -XX:MaxPermSize=256m'
+linux下为单引号
+
+
+8.添加海口webservice许可。
+http://59.50.95.63:9999/EjdbWebService.asmx 该页面选择对应方法进行IP添加。
+key是cfwx68508081
+
+http://59.50.95.63:9999/logs/log.html 访问日志。
+
+9.第三方URL：
+ip:port/RoxMarket ,配置为3G页面。在微信菜单上为菜单链接。
+
+10.异常注意事项
+为了保持数据完整，重启时间最好是在休市时间。如果选项6为0，重启后，不会包含当日分时数据。

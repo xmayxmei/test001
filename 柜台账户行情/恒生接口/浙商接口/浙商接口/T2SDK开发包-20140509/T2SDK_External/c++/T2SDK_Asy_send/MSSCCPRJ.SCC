@@ -1,0 +1,22 @@
+SCC = This is a Source Code Control file.
+
+[fsc_drawesb_flow.sln]
+SCC_Aux_Path = cm02.hundsun.com:8882:10105-证券研发部
+SCC_Project_Name = $/fbase/2.0/Active/Sources/c#/BizSrc/drawesb_flow
+
+[fsc_drawesb_flow.csproj]
+SCC_Aux_Path = cm02.hundsun.com:8882:10105-证券研发部
+SCC_Project_Name = $/fbase/2.0/Active/Sources/c#/BizSrc/drawesb_flow
+
+[CSharpHSRCP.sln]
+SCC_Aux_Path = cm02.hundsun.com:8882:10105-证券研发部
+SCC_Project_Name = $/fbase/2.0/Active/Sources/c#/CSharpHSRCP
+
+[CSharpHSRCP.csproj]
+SCC_Aux_Path = cm02.hundsun.com:8882:10105-证券研发部
+SCC_Project_Name = $/fbase/2.0/Active/Sources/c#/CSharpHSRCP
+
+[FileUpLoad.csproj]
+SCC_Aux_Path = cm02.hundsun.com:8882:10105-证券研发部
+SCC_Project_Name = $/fbase/2.0/Active/Sources/c#/FileUpLoad
+

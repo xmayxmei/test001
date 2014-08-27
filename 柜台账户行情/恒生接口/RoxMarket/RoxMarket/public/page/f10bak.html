@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+<link rel="stylesheet" type="text/css" href="../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../css/css.css" />
+<style type="text/css" media="all">
+#wrapper {
+	position:absolute; z-index:1;
+	top:71px; bottom:0; left:0;
+	width:100%;
+	overflow:auto;
+}
+#scroller {
+	position:absolute; z-index:1;
+/*	-webkit-touch-callout:none;*/
+	-webkit-tap-highlight-color:rgba(0,0,0,0);
+	width:100%;
+	padding:5px;
+	 line-height:23px;
+}
+.nav_l{ overflow:hidden; height:35px; font-weight:bold;font-size:12px; background:url(../images/nav_back.png)}
+.nav_l a.first{ background:url(../images/change_back.png); color:#fff;   }
+.nav_l a{ font-size:15px; color:#852B00 ;  display:inline-block; width:25%; float:left; text-align:center;height:35px; line-height:35px;}
+#wrapper{ color:#000;}
+</style>
+<title>F10</title>
+</head>
+
+<body>
+        <div class="nav_l">
+             <a class="first" data_id="20" secucode="1"  href="#" onclick="shownews(this);" id="new_menu">公司概况</a>
+             <a class="" data_id="90" secucode="1" href="#" onclick="shownews(this);" id="new_menu">财务指标</a>
+             <a class="" data_id="110" secucode="1" href="#" onclick="shownews(this);" id="new_menu">主营构成</a>
+             <a class="" data_id="50" secucode="1" href="#" onclick="shownews(this);" id="new_menu">主要股东</a>
+        </div>
+        <div class="nav_l">
+             <a  data_id="1" secucode="30"  href="#" onclick="shownews(this)" id="new_menu">股本结构</a>
+             <a class="" data_id="40" secucode="1" href="#" onclick="shownews(this);" id="new_menu">分红扩股</a>
+             <a class="" data_id="140" secucode="1" href="#" onclick="shownews(this);" id="new_menu">公告提示</a>
+             <a class="" data_id="120" secucode="1" href="#" onclick="shownews(this);" id="new_menu">重大事项</a>
+        </div>
+
+<div id="wrapper">
+	<div id="scroller">
+        <p style="">
+            内容加载中...
+        </p>
+	</div>
+</div>
+
+<script src="../js/zepto.min.js" language="javascript" type="text/javascript"></script>
+<script src="../js/iscroll.min.js" language="javascript" type="text/javascript"></script>
+<script type="text/javascript">
+function shownews(opt){
+   $(".first").attr("class",'');
+   $(opt).attr("class",'first');
+   page_newid = $(opt).attr("data_id");
+   getdata();
+}
+function getdata(){
+          $.ajax({
+				type: 'post',
+				url: '../../jynews/ajaxf10.do',
+				data: {
+				  'id':page_newid,
+					'page':'600093'
+				},
+				dataType: 'json',
+				success: function(d){
+					var divHtml = "";
+					for(i=0;i<d.news.length;i++){
+						divHtml=d.news[0].content
+					}
+				$("#scroller").html($(divHtml));
+				}
+			});
+}
+
+var myscroll;
+			function loaded(){
+
+				myscroll=new iScroll("wrapper",{
+					hScroll:false,
+					hideScrollbar:true,
+					/* bounce:false,
+					 bounceLock:false,
+					 momentum:false*/
+					 });
+				myscroll.refresh();
+
+			}
+			document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+			document.addEventListener("DOMContentLoaded",loaded,false);
+
+</script>
+</body>
+</html>

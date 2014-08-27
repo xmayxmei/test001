@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	这里所有关于时间的单位都是：毫秒
+	<performance>
+		1) heartbeatTime : 发送心跳的间隔时间
+		2) connTimeout : 链接到服务器端
+		3) reconnTimes : 断开重连的次数
+		4) responseTimeout : 发送每个请求，响应超时时间
+		5) responseWorker  : 处理响应信息线程数
+		6) receiveBuffer   : 接收缓冲区大小
+		7) sendBuffer      : 发送缓冲区大小
+	</performance>
+	
+	<target>
+		1) host 主机
+		2) port 端口号
+		3) charset 编码方式
+	</target>
+ -->
+<gwsdk-configuration>
+	<performance>
+		<heartbeatTime>60000</heartbeatTime>
+		<connTimeout>3000</connTimeout> <!-- 暂时没用 -->
+		<reconnTimes>3</reconnTimes>
+		<responseTimeout>10000</responseTimeout>
+		<responseWorker>10</responseWorker>
+		<receiveBuffer>131042</receiveBuffer><!-- 128K -->
+		<sendBuffer>131042</sendBuffer><!-- 128K -->
+	</performance>
+	
+	<target>
+		<host>10.51.129.129</host>
+		<port>8989</port>
+		<charset>UTF-8</charset>
+	</target>
+</gwsdk-configuration>
+

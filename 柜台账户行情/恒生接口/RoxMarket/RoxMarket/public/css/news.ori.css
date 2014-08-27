@@ -1,0 +1,243 @@
+﻿html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center, dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	line-height: inherit;
+	vertical-align: baseline;
+	background: transparent;
+	font-family: 微软雅黑;
+	outline: none;
+	-webkit-tap-high-light-color: rgba(0,0,0,0);
+	-webkit-focus-ring-color: rgba(0,0,0,0);
+}
+*:focus{
+	outline: none!important;
+}
+html{
+	width: 100%;
+	/*overflow: hidden;*/
+}
+body {
+	line-height: 1;
+	/*overflow: hidden;*/ 
+}
+
+ol, ul {
+	list-style: none;
+}
+.container{
+	background: #22292C;
+	/*
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;*/
+}
+.hide-scroll{
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;
+	overflow: hidden;
+}
+.row{
+	border-top: 1px solid #373e42;
+	border-bottom: 1px solid #13181f;
+	line-height: 3;
+	position: relative;
+
+}
+.row > a{
+	display: block;
+	text-decoration: none;
+}
+h3{
+	color: #1f87bd;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+
+	
+}
+.n-title{
+	position: relative;
+	padding-left: 60px; 
+	font-weight: 400;
+	font-size: 18px;
+
+}
+.n-title:before{
+	position: absolute;
+    content: '';
+    height: 32px;
+    width: 28px;
+    background: url(/RoxMarket/public/images/icons.png) 0px -126px;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    background-size: 132px;
+}
+.sub-type{
+	font-size: 15px;
+	height:0;
+	overflow: hidden;
+}
+.h{
+	height: auto;
+}
+.sub-type a{
+	line-height: 2.5;
+	display: block;
+	color: #98a0ae;
+	text-decoration: none;
+	text-indent: 3em;
+	-webkit-transition: color .3s;
+
+}
+.sub-type li:nth-child(2n+1) a{
+	color: #fff;
+	background: #2a3236;
+}
+.slide{
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 0%;
+	right: 0%;
+	background: white;
+	-webkit-transition: all .5s linear;
+	-moz-transition: all .5s linear;
+	-ms-transition: all .5s linear;
+	transition: all .5s linear;
+	overflow: hidden;
+	z-index: 5;
+	
+}
+.slide.show{
+	width: 100%;
+}
+.n-item{
+	border-top: 1px solid #f6f7f9;
+	border-bottom: 1px solid #a4b0bb;
+	padding: 5px 0;
+	background: #dadfe4;
+}
+.n-item:first-child{
+	border-top: none;
+
+}
+.n-item > a{
+	display: block;
+	text-decoration: none;
+}
+.n-item h3{
+	color: #3e4751;
+	line-height: 2;
+}
+.n-item p{
+	color: #687586;
+	font-size: 15px;
+}
+p.n-text, .n-text {
+	line-height: 2em;
+	text-align:left;
+	color: #3e4751; 
+    font-size: 15px;
+	word-wrap: break-word;
+}
+.slide-head, .newscontent-head{
+	line-height: 3;
+	background: #1f78bd;
+	color: white;
+	position: relative;
+}
+.slide-head h3, .newscontent-head h3{
+	color: inherit;
+	text-align: center;
+	font-size: 18px;
+}
+.slide-hide{
+	position: absolute;
+	height: 25px;
+	width: 32px;
+	background: url(/RoxMarket/public/images/le.png);
+	margin: auto;
+	top: 0;
+	bottom: 0;
+	left: 15px;
+	z-index: 10;
+}
+.go-search{
+	background: url("/RoxMarket/public/images/icon.png") repeat scroll -214px -5px;
+    bottom: 0;
+    height: 25px;
+    margin: auto;
+    position: absolute;
+    right: 15px;
+    top: 0;
+    width: 32px;
+    z-index: 12;
+}
+.go-back{
+	background: url("/RoxMarket/public/images/icon.png") repeat-x scroll -133px -4px;
+    bottom: 0;
+    height: 30px;
+    margin: auto;
+    position: absolute;
+    left: 15px;
+    top: 0;
+    width: 30px;
+    z-index: 12;
+    border-radius: 30px;
+    border: 2px solid #fff;
+}
+.slide-body{
+	position: absolute;
+	top: 54px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	overflow: auto;
+    background: #dadfe4;
+    padding: 0 15px;
+}
+.newscontent{
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: none;
+	background: #fff;
+	z-index: 20;
+}
+.newscontent-body{
+	position: absolute;
+	top: 54px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow: auto;
+	background: #dadfe4;
+    padding: 15px;
+}
+.newscontent-body .n-item {
+    border-top: 0px solid #f6f7f9;
+    border-bottom: 0px solid #a4b0bb;
+    padding: 0;
+    background: transparent;
+}

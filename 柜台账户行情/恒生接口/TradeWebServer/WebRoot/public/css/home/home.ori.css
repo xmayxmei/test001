@@ -1,0 +1,60 @@
+.topmenu {
+	background:blue;
+	height:50px;
+}
+.topmenu a {
+	color : white;
+	float:left;
+	width:25%;
+	height:100%;
+	text-align:center;
+	vertical-align:middle;
+	line-height:50px;
+	-webkit-box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	-o-box-sizing:border-box;
+	box-sizing:border-box;
+	border-left:1px solid #2f80bb;
+	border-right:1px solid #4b9dd7;
+	overflow:hidden;
+}
+.topmenu a:first-of-type {
+	border-left-width:0; 
+}
+.topmenu a:last-of-type {
+	border-right-width:0; 
+}
+.mnuFocus {
+	background: -webkit-linear-gradient(top, #3486BE, #2F7DB7, #2B73AF);
+	background: -o-linear-gradient(top, #3486BE, #2F7DB7, #2B73AF);
+	background: -moz-linear-gradient(top, #3486BE, #2F7DB7, #2B73AF);
+	background: linear-gradient(top, #3486BE, #2F7DB7, #2B73AF);
+}
+.mnuLost{
+	background: -webkit-linear-gradient(top, #3B99D9, #368ED0, #3184C8);
+	background: -o-linear-gradient(top, #3B99D9, #368ED0, #3184C8);
+	background: -moz-linear-gradient(top, #3B99D9, #368ED0, #3184C8);
+	background: linear-gradient(top, #3B99D9, #368ED0, #3184C8);
+}
+.divCenter{
+	padding : 10px;
+}
+.divCenter img{
+	min-width:30px;
+	width: 65%;
+	max-width: 150px;
+	margin:0px;
+}
+
+img:hover{
+	opacity: 0.3;
+	filter: alpha(opacity=30);
+}
+.line{
+	padding:0px;
+}
+.cell {
+	display: inline-block;
+	margin: -4px;
+	width : 33.33%;
+}

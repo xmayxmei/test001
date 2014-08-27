@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="public/css/base${compressSuffix}.css?${version}">
+<title>提示</title>
+</head>
+<body>
+  <div class='container'> 
+  	<div class='info'> 
+       <#if isSuccess??>
+			<img src='public/img/a.png'>
+      		<div class="tips">${msg!""}</div>
+      	<#else>
+      		 <img src='public/img/b.png'>
+      		 <div class="tips">${msg!""}</div>
+		</#if>
+	</div>
+  </div>
+</body>
+</html>

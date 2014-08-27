@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="public/css/base${compressSuffix}.css?${version}">
+    <link rel="stylesheet" href="public/css/pickdate${compressSuffix}.css?${version}">
+<title>资金流水查询</title>
+<style type="text/css">
+html, body {
+	background: #fff;
+}
+.data td{
+	padding:18px 1px;
+}
+</style>
+</head>
+<body id="pageTrade">
+<div class="container">
+  <form id="formQuery" name="formQuery" action="">
+  <input type="hidden" id="cusFields" value="1,5,3,6">
+    <div class="nav">
+        <div class="tab">
+            <span>资金流水查询</span>
+            <div class="btn-back" onclick="top.location.href = '${rc.getContextPath()}/homePage.do?page=2'">返回</div>
+        </div>
+    </div>
+    <div class="search-date">
+      <div class="date-wrap">
+        <div class="left">
+          <div class="ds"><div id="startDate" name="startDate" class="input-def input-date input-shadow"></div></div>
+          <div class="de"><div id="endDate" name="endDate" class="input-def input-date input-shadow"></div></div>
+          <div class="mid">至</div>
+        </div>
+        <div class="search-icon" onClick="validateDate();">
+          <div class="circle"></div>
+          <div class="hander"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="content">
+    
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="public/js/Common/Common${compressSuffix}.js?${version}"></script>
+<script type="text/javascript" src="public/js/zepto.min.js?${version}"></script>
+<script type="text/javascript" src="public/js/Common/jMessage${compressSuffix}.js?${version}"></script>
+<script type="text/javascript" src="public/js/Common/pickadate${compressSuffix}.js?${version}"></script>
+<script type='text/javascript' language="javascript">
+function validateDate(){
+	var startDate = $.trim($('#startDate').text()),
+	endDate = $.trim($('#endDate').text());
+	if((startDate.length <=0 || startDate == "yyyymmdd") || (endDate.length <= 0 || endDate == "yyyymmdd")){
+		jMessage.open({title: '', content: '请输入日期', model: 'alert', autoHide: true});
+		return false;
+	}
+	if(!(/^\d{8}$/.test(startDate)) || !(/^\d{8}$/.test(endDate))){
+		jMessage.open({title: '', content: '日期格式错误', model: 'alert', autoHide: true});
+		return false;
+	}
+	else if(!formatteDate(startDate) || !formatteDate(endDate)){
+		jMessage.open({title: '', content: '日期输入错误', model: 'alert', autoHide: true});
+		return false;
+	}
+	DataBind();
+}
+
+function DataBind(){
+	var sBasePath = "${rc.getContextPath()}";
+	$(".content").empty();
+	$.ajax({
+		data: {
+			start_date:$.trim($('#startDate').text()),
+			end_date:$.trim($('#endDate').text()),
+			cusFields:$('#cusFields').val()			
+		},
+		url:sBasePath + "/queryFundsDt.do",
+		type: 'get',
+		dataType: 'json',
+		beforeSend: function(){
+			$(".load").show();
+		},
+		success: function(data){
+			$(".content").empty();
+			var ort, tr, table = '<table class="data" width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td class="dtitle center" nowrap>日期</td><td class="dtitle" nowrap>发生额</td><td class="dtitle center" nowrap>业务</td><td class="dtitle" nowrap>余额</td></tr></table>';
+			if(data.errMsg == "" && data.data){
+				ort = data.data;
+				tr = '<tr><td class="center">{0}</td><td>{1}</td><td class="center">{2}</td><td>{3}</td></tr>';
+				$(".content").append(table);
+				if(ort.length > 0)
+				{
+					for(var i = 0; i < ort.length; i++){
+						$(".content table.data").children().append(tr.format(ort[i][0],ort[i][1],ort[i][2],ort[i][3]));
+					}
+				}
+				else{
+					$(".content table.data").children().append("<tr><td colspan=4 align=center><font color=red>没有找到任何数据!</font></td></tr>");
+				}
+			}
+			else{
+				$(".content").append(table).children().children().append("<tr><td colspan=4 align=center><font color=red>" + data.errMsg + "</font></td></tr>");
+			}
+		},
+		complete: function(){
+			$(".load").hide();
+		}
+	});
+}
+
+/* function getFormtAmount(v_sIn, v_sOut){
+	var tmp = "<td></td><td></td>";
+	var iIn = parseFloat(v_sIn), iOut = parseFloat(v_sOut);
+	if(iIn && iIn > 0){
+		tmp = '<td>'+iIn+'</td><td class="center"><span class="green">收入</span></td>';
+	}
+	else if(iOut && iOut > 0){
+		tmp = '<td>'+iOut+'</td><td class="center"><span class="red">付出</span></td>';
+	}
+	return tmp;
+} */
+
+$(function(){
+		$('#startDate,#endDate').text('yyyymmdd').css('color', '#ccc');
+		$("<div class='load'></div>").appendTo($("body")).hide();
+		$("#startDate").datepicker({onSelect:function(d){
+			$("#endDate").datepicker('option', 'minDate', d);
+		}});
+		$("#endDate").datepicker({onSelect:function(d){
+			$("#startDate").datepicker('option', 'maxDate', d);
+		}});
+	});
+</script>
+</html>

@@ -1,0 +1,84 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>资金查询</title>
+    <link rel="stylesheet" href="public/css/base${compressSuffix}.css?${version}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<style type="text/css">
+	.ul-list{
+		width:100%;
+		max-width:100%;
+	}
+	@media only screen and (max-width: 350px) {
+		.li-item .t{
+			padding:0 5px 0 2px;
+			width: 80px;
+		}
+	}
+</style>
+</head>
+
+<body>
+	<div class="container">
+        <div class="nav">
+            <div class="tab">
+                <span>资金查询</span>
+                <div class="btn-back" onclick="top.location.href = '${rc.getContextPath()}/homePage.do?page=2'">返回</div>
+            </div>
+        </div>
+  	<div class="main mar-top20">
+  	<#if lstFunds??>
+	  <#list lstFunds as funds>
+    	<div class="corner mar-bm10">
+    		<div class="ul-list">
+          <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        	  <tr class="li-item">
+              <td class="bfi"><span class="b1"></span></td>
+              <td class="t">资金账户：</td>
+              <td class="v">${funds.acc}</td>
+           	  </tr>
+           	  <tr class="li-item">
+              <td class="bfi"><span class="b1"></span></td>
+              <td class="t">资金余额：</td>
+              <td class="v">${funds.fundsBal}</td>
+           	  </tr>
+           	  <tr class="li-item">
+              <td class="bfi"><span class="b1"></span></td>
+              <td class="t">冻结资金：</td>
+              <td class="v">${funds.freezebal}</td>
+           	  </tr>
+           	  <tr class="li-item">
+              <td class="bfi"><span class="b1"></span></td>
+              <td class="t">可用资金：</td>
+              <td class="v">${funds.availFunds}</td>
+           	  </tr>
+           	   <tr class="li-item">
+              <td class="bfi"><span class="b1"></span></td>
+              <td class="t">可取资金：</td>
+              <td class="v">${funds.adviFunds}</td>
+           	  </tr>
+           	  <tr class="li-item">
+              <td class="bfi"><span class="b1"></span></td>
+              <td class="t">股票市值：</td>
+              <td class="v">${funds.marketVal}</td>
+           	  </tr>
+           	  <tr class="li-item">
+              <td class="bfi"><span class="b1"></span></td>
+              <td class="t">总  资  产 ：</td>
+              <td class="v">${funds.totalAssert}</td>
+           	  </tr>
+          </table>
+        </div>
+    	</div>
+    	  </#list>
+          	<#else>
+          		数据为空.
+			</#if>
+    </div>
+  </div>
+</body>
+</html>

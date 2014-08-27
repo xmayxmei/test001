@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="public/css/base${compressSuffix}.css?${version}">
+<title>委托查询-当日委托</title>
+<style type="text/css">
+html, body {
+	background: #fff;
+}
+</style>
+</head>
+<body id="pageTrade">
+<div class="container">
+  <div class="nav">
+    <div class="tab">
+      <span>当日委托</span>
+      <div class="btn-back" onclick="top.location.href = '${rc.getContextPath()}/homePage.do?page=2'">返回</div>
+    </div>
+  </div>
+  <form id="formTrade" name="formTrade" action="">
+  <input type="hidden" id="cusFields" value="4,3,7,8,6,23,16">
+  </form>
+  <div class="content">
+    
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="public/js/Common/Common${compressSuffix}.js?${version}"></script>
+<script type="text/javascript" src="public/js/zepto.min.js?${version}"></script>
+<script type='text/javascript' language="javascript">
+
+function DataBind(){
+	var sBasePath = "${rc.getContextPath()}";
+	$(".content").empty();
+	$.ajax({
+		data: {
+			cusFields:$('#cusFields').val()		
+		},
+		url:sBasePath + "/todayOrder.do",
+		type: 'get',
+		dataType: 'json',
+		beforeSend: function(){
+			$(".load").show();
+		},
+		success: function(data){
+			$(".content").empty();
+			var ort, tr, table = '<table class="data" width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td class="dtitle center" nowrap>名称/代码</td><td class="dtitle" nowrap>价格</td><td class="dtitle" nowrap>数量</td><td class="dtitle center" nowrap>方向</td><td class="dtitle center" nowrap>时间</td><td class="dtitle center" nowrap>状态</td></tr></table>';
+			if(data.errMsg == "" && data.data){
+				ort = data.data;
+				tr = '<tr><td class="center">{0}<br/><span class="code">{1}</span></td><td>{2}</td><td>{3}</td><td class="center">{4}</td><td class="center">{5}</td><td class="center">{6}</td></tr>';
+				$(".content").append(table);
+				if(ort.length > 0)
+				{
+					for(var i = 0; i < ort.length; i++){
+						$(".content table.data").children().append(tr.format(ort[i][0],ort[i][1],ort[i][2],ort[i][3],ort[i][4],ort[i][5],ort[i][6]));
+					}
+				}
+				else{
+					$(".content table.data").children().append("<tr><td colspan=6 align=center><font color=red>没有找到任何数据!</font></td></tr>");
+				}
+			}
+			else{
+				$(".content").append(table).children().children().append("<tr><td colspan=6 align=center><font color=red>" + data.errMsg + "</font></td></tr>");
+			}
+		},
+		complete: function(){
+			$(".load").hide();
+		}
+	});
+}
+
+function getFormtStatus(v_sStatus){
+	var tmp = '<img src="public/img/ico02.png" width="19">', iTa = parseInt(v_sStatus);
+	if(iTa && iTa == 6){
+		tmp = '<img src="public/img/ico01.png" width="19">';
+	}
+	return tmp;
+}
+
+$(function(){
+		$("<div class='load'></div>").appendTo($("body")).hide();
+		DataBind();
+	});
+</script>
+</html>

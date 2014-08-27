@@ -1,0 +1,46 @@
+<?xml version="1.0" ?> 
+<project name="TradeGateway" default="war">
+	<path id="compile.classpath">
+		<fileset dir="WebRoot/WEB-INF/lib">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="buildDepend">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
+	<target name="init">
+		<mkdir dir="build/classes"/>
+		<mkdir dir="dist" />
+	</target>
+	
+	<target name="compile" depends="init" >
+		<javac destdir="build/classes" debug="true" encoding="UTF-8" srcdir="src-native">
+				<classpath refid="compile.classpath"/>
+		</javac>
+		<javac destdir="build/classes" debug="true" encoding="UTF-8" srcdir="src-trading">
+				<classpath refid="compile.classpath"/>
+		</javac>
+		<javac destdir="build/classes" debug="true" encoding="UTF-8" srcdir="src-server">
+						<classpath refid="compile.classpath"/>
+		</javac>
+		<javac destdir="build/classes" debug="true" encoding="UTF-8" srcdir="src">
+			<classpath refid="compile.classpath"/>
+		</javac>
+	</target>
+	
+	<target name="war" depends="compile">
+		<war destfile="dist/TradeGateway.war" webxml="WebRoot/WEB-INF/web.xml">
+			<fileset dir="WebRoot"/>
+			<lib dir="WebRoot/WEB-INF/lib"/>
+			<classes dir="build/classes"/>
+		</war>
+		<delete dir="build" />
+	</target>
+	
+	<target name="clean">
+		<delete dir="dist" />
+		<delete dir="build" />
+	</target>
+	
+</project>

@@ -1,0 +1,12 @@
+如果与其他项目共用一个Redis，请注意下面的索引:
+下面是RoxMarket用到Redis的Key前缀：
+"min5_"
+"min10_;
+"min15_";
+"min30_";
+"min60_";
+"daily_";
+"weekly_";
+"monthly_";
+"yearly_";
+"stock_baseinfo_";

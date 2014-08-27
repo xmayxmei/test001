@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t2sdk-configuration>
+	<performance heartbeatTime="90" acquireConnWaitTime="1000"
+		registerTime="5" reconnInterval="3" localServerName="localhost"
+		callBackTime="1000" enmCompress="true" compressionThreshold="0" />
+	<parents>
+		<parent parentName="zszh_cs" safeLevel="NONE">
+			<limit licenseFile="e:\cfwx\(20140423)ZSZQ-HNCFWXRXW-0000_3rd.dat" encrypt="" />
+			
+			<members>
+				<member no="5" address="10.51.75.81" port="8001" charset="gbk"
+					poolSize="3" />
+			</members>
+
+		</parent>
+
+	</parents>
+
+	<logAdapter className="com.hundsun.t2sdk.impl.util.CommonLogAdapter" />
+
+</t2sdk-configuration>
+

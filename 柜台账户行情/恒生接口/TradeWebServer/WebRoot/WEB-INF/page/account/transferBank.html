@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="format-detection" content="telephone=no">
+<meta http-equiv="pragma" content="no-cache">
+<meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+<meta HTTP-EQUIV="expires" CONTENT="0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+          <link rel="stylesheet" href="public/css/base${compressSuffix}.css?${version}">
+<title>银证转帐-证券转银行</title>
+<style type="text/css">
+	.outter:nth-of-type(1) img{
+		width:24.5px;
+	}
+	.outter:nth-of-type(2) img{
+		width:23.5px;
+	}
+	.outter:nth-of-type(3) img{
+		width:17.5px;
+	}
+	.outter:nth-of-type(4) img{
+		width:16.5px;
+	}
+</style>
+</head>
+<body>
+    <div class="nav">
+        <div class="tab">
+            <span>证券转银行</span>
+            <div class="btn-back" onclick="top.location.href = '${rc.getContextPath()}/homePage.do?page=3'">返回</div>
+        </div>
+    </div>
+	<form id="formTransfer" name="formTransfer" method="post" action="${rc.getContextPath()}/zqToBank.do">
+		<div class="main mar-top20">
+			<div class="outter select-right">
+				<img class="prefix" src="public/img/icon08.png"> 
+				<select id="yhdm" name="yhdm" class="select-def pad-left40 rel">
+        </select>
+			</div>
+      <div class="outter select-right">
+				<img class="prefix" src="public/img/icon01.png"> 
+				<select id="bz" name="bz" class="select-def pad-left40 rel">
+				</select>
+			</div>
+			<div class="outter">
+				<img class="prefix" src="public/img/icon03.png"> 
+				<input id="fund_password" name="fund_password" placeholder="资金密码" maxlength="50" type="password" class="input-def pad-left45">
+			</div>
+      <div class="outter">
+				<img class="prefix" src="public/img/icon05.png"> 
+				<input id="occur_balance" name="occur_balance" placeholder="转账金额" maxlength="50" class="input-def pad-left45" type="text">
+			</div>
+			<div class="outter">
+			<input type="hidden" id="transfer_direction" name="transfer_direction" value="2">
+      	<input type="hidden" id="fund_account" name="fund_account">
+        <input type="hidden" id="bank_no" name="bank_no">
+				<button id="btnSubmit" name="btnSubmit" type="button" class="btn-def btn-submit wid49">提交</button>
+        <button id="btnReset" name="btnReset" type="button" onClick="this.form.reset();" class="btn-def btn-reset wid49" >重置</button>
+			</div>
+		</div>
+		</form>
+</body>
+<script type="text/javascript" src="public/js/zepto.min.js?${version}"></script>
+<script type="text/javascript" src="public/js/Common/jMessage${compressSuffix}.js?${version}"></script>
+<script type='text/javascript' language="javascript">
+var sBasePath = "${rc.getContextPath()}";
+function submitForm(){
+	if(validateForm()){
+		GetData();
+		$("#formTransfer").submit();
+	}
+	return;
+}
+function validateForm(){
+	var obankName = $('#yhdm'),ocuyType = $('#bz'),ozjPw = $('#fund_password'),omAmount = $('#occur_balance');
+	if(obankName[0].selectedIndex <= -1){
+		jMessage.open({title: '', content: '请选择银行', model: 'alert', autoHide: true});
+		//obankName.focus();
+		return false;
+	}
+	if(ocuyType[0].selectedIndex <= -1){
+		jMessage.open({title: '', content: '请选择币种', model: 'alert', autoHide: true});
+		//ocuyType.focus();
+		return false;
+	}
+	if(ozjPw.val().length<1){
+		jMessage.open({title: '', content: '请输入资金密码', model: 'alert', autoHide: true});
+		//ozjPw.focus();
+		return false;
+	}
+	if(omAmount.val().length<1 || omAmount.val() == "转账金额"){
+		jMessage.open({title: '', content: '请输入转账金额', model: 'alert', autoHide: true});
+		//omAmount.focus();
+		return false;
+	}
+	else if(!checkNum(omAmount.val())){
+		jMessage.open({title: '', content: '转账金额必须是正数', model: 'alert', autoHide: true});
+		//omAmount.focus();
+		return false;
+	}
+	return true;
+}
+
+function GetData(){
+	var obankName = $('#yhdm');
+	if(obankName[0].selectedIndex > -1){
+		$("#bank_no").val(obankName[0].options[obankName[0].selectedIndex].getAttribute("d1"));
+		$("#fund_account").val(obankName[0].options[obankName[0].selectedIndex].getAttribute("d2"));
+	}
+}
+$(function(){
+	$('#occur_balance').bind("input", function(){this.value=this.value.replace(/[^\d|.]/g,'');});
+	if(!('placeholder' in document.createElement('input'))){
+		$('#occur_balance').val('转账金额')
+		.bind({
+			'focus': function(){
+				if($(this).val() == '转账金额' ){
+					$(this).val('');
+				}
+			},
+			'blur': function(){
+				if($.trim($(this).val()) == '' ){
+					$(this).val('转账金额');
+				}
+			}
+		});
+	}
+	BindBank();
+});
+
+var arrCur = [];
+function BindBank(){
+	var dllBankName = $("#yhdm"), sTmp = "", stpl = '<option value="$ItemValue" d1="$Data1" d2="$Data2">$ItemName</option>';
+	$.ajax({
+		url:sBasePath + "/queryBoundBank.do",
+		type:'post',
+		data:{},
+		dataType: 'json',
+		success: function(data){
+			if(data.errMsg == "" && data.data){
+				ort = data.data;
+				for(var i = 0; i < ort.length; i++){
+				    sTmp += stpl.replace(/\$ItemValue/g, ort[i][1]).replace(/\$ItemName/g, ort[i][4] + '(' + ort[i][0] + ')').replace(/\$Data1/g, ort[i][1]).replace(/\$Data2/g, ort[i][2]);
+					arrCur[i] = [ort[i][3]];
+				}
+				dllBankName.html(sTmp);
+				BindCurrcy(dllBankName[0].selectedIndex);
+				dllBankName.bind("change", function(){BindCurrcy(this.selectedIndex);})
+			}
+		}
+	});
+}
+
+function BindCurrcy(v_iIndex){
+	var sTmp = "", stpl = '<option value="$ItemValue">$ItemName</option>';
+	if(v_iIndex > -1){
+		for(var i = 0; i < arrCur[v_iIndex].length; i++){
+			sTmp += stpl.replace(/\$ItemValue/g, arrCur[v_iIndex][i]).replace(/\$ItemName/g, arrCur[v_iIndex][i]);
+		}
+		$("#bz").html(sTmp);
+	}
+}
+
+function checkNum(v_str){ 
+	var iNum, sNum = v_str.replace(".","");
+	if(sNum.indexOf(".") > -1)
+		return false;
+	iNum = parseFloat(v_str);
+	if(isNaN(iNum))
+		return false;
+	else if(iNum <= 0)
+		return false;
+	return true;
+} 
+$(function(){
+	var tap = 'click';
+	if('ontouchend' in document.createElement('div')){
+		tap = 'touchend';
+	}
+	$("#btnSubmit").bind(tap, function(){
+		submitForm();
+	})	
+})
+</script>
+</html>

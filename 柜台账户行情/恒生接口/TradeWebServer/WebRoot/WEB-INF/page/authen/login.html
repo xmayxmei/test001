@@ -1,0 +1,268 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport"
+          content="width=device-width, minimum-scale=1.0, initial-scale=1.0, maximum-scale=1.0, user-scalable=1" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>登录</title>
+    <script type="text/javascript" src="public/js/zepto.min.js?${version}"></script>
+    <script type="text/javascript" src="public/js/Common/security.js?${version}"></script>
+    <link rel="stylesheet" href="public/css/login/login${compressSuffix}.css?${version}">
+    <link href="public/css/bottom${compressSuffix}.css?${version}" rel="stylesheet" />
+    <style type='text/css'>
+        input[type="text"], input[type="password"] {
+            border: 1px solid #B02727;
+        }
+
+        .form {
+            height: 100%;
+            top: 0px;
+            padding: 10px;
+            background: -moz-linear-gradient(0% 0% 270deg, rgb(243, 101, 63), rgb(198, 33, 27)) repeat scroll 0% 0% transparent;
+            box-shadow: 0px 2px 5px rgb(210, 67, 39) inset;
+        }
+
+        .row {
+            padding: 0px;
+        }
+        #errMsg {
+            font-size: 15px;
+            font-weight:bold;
+        }
+
+        .show {
+            opacity: 1;
+            -webkit-transition: opacity 0s;
+            -moz-transition: opacity 0s;
+            -o-transition: opacity 0s;
+            transition: opacity 0s;
+        }
+
+        .hide {
+            opacity: 0;
+            -webkit-transition: opacity 5s;
+            -moz-transition: opacity 5s;
+            -o-transition: opacity 5s;
+            transition: opacity 5s;
+        }
+    </style>
+    <script type='text/javascript'>
+        var alertMsg = {
+            callback: null,
+            show: function (option) { //mode为空，即只有一个确认按钮，mode为1时有确认和取消两个按钮
+                var tpl = $("#tiptemplate").html();
+                tpl = tpl.replace("$title", option.title == null ? "" : option.title);
+                tpl = tpl.replace("$info", option.info == null ? "" : (option.info.length > 60 ? option.info.substring(0, 60) + "..." : option.info));
+                tpl = tpl.replace("$status", option.status == null ? "ok" : option.status);
+
+                callback = option.callback;
+                $("body").append(tpl);
+                var touch_dev = false;
+                //判断使用设备
+                if (navigator.userAgent.indexOf('iPhone') > 0 || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('iPad') > 0 || navigator.userAgent.indexOf('Android') > 0) {
+                    touch_dev = true;
+                }
+                var tip = "click";
+                if (touch_dev) {
+                    tip = "touchend";
+
+                }
+                $('.alertMsg a').bind(tip, function () {
+                    alertMsg.closeAlertMsg()
+                })
+            },
+            closeAlertMsg: function () { //mode为空，即只有一个确认按钮，mode为1时有确认和取消两个按钮
+                if (callback != null) {
+                    callback();
+                }
+                $(".alertMsg").remove();
+            }
+        }
+    </script>
+</head>
+<body>
+    <script id="tiptemplate" type="template">
+        <div class="alertMsg">
+            <div class="shadowDiv"></div>
+            <div class="msgwin">
+                <p class="msgwin_img $status"></p>
+                <p class="msgwin_title">$title</p>
+                <p class="msgwin_info">$info</p>
+                <p class="msgwin_btn"><a class="button red"><span>确定</span> </a></p>
+            </div>
+        </div>
+    </script>
+
+    <div class='body'>
+
+        <div class='logo-container'>
+            <div class='logo-container-img'></div>
+        </div>
+        <div class='form'>
+            <form id="frmLogin" method="post" action="${rc.getContextPath()}/loginAuthen.do">
+                <div id="errMsg">
+                    <#if errMsg??>
+                        ${errMsg}
+                    </#if>
+                </div>
+                <div class='blank'>
+
+                </div>
+                <div class='row-select select-right'>
+                    <img class="prefix" src="public/img/icon01.png">
+                    <select name="loginType" id="loginType" class="select-def rel">
+                        <option selected="selected" value="1">资金账号</option>
+                        <option value="2">深证A股</option>
+                        <option value="3">上证A股</option>
+                    </select>
+                </div>
+                <div class='blank'>
+
+                </div>
+                <div class='row'>
+                    <input id="account_content" name="account_content" placeholder="请输入账号" maxlength="50" class="account" type="tel">
+                </div>
+                <div class='blank'>
+
+                </div>
+                <div class='row '>
+                    <input id="password1" name="password1" placeholder="请输入密码" maxlength="50" class="pass" type="password">
+                    <input id="password" name="password" type="hidden">
+                </div>
+                <div class='blank'>
+
+                </div>
+                <div class='row captchaContainer'>
+                    <div class="inner">
+                        <input id="captcha" name="captcha" maxlength="4" placeholder="请输入验证码" class="captcha" type="tel">
+                    </div>
+                    <div class="captchaimg">
+                        <img id="imgCaptcha" class="validcode">
+                    </div>
+                </div>
+                <div class='blank'>
+
+                </div>
+                <div class='row'>
+                    <input name="url" id="url" value="${url}" type="hidden">
+                    <input name="loginType" id="loginType" value="1" type="hidden">
+                    <a class='button orange' id="login" name="login">
+                        登录
+                    </a>
+                </div>
+                <div style="height:45px;">
+
+                </div>
+            </form>
+        </div>
+    </div>
+    <#include "../common/bottom.html">
+    <script>
+        var host = "${rc.getContextPath()}";
+        var md = "${md!""}";
+        var exp = "${exp!""}";
+
+        function errortip(title,info){
+            freshCaptcha();
+            alertMsg.show({
+                'title' : title,
+                'status' : 'warn',
+                'info' : info
+            });
+        }
+
+        function validateForm(){
+            var ologinType = $('#loginType'),oAccountContent = $('#account_content'),opassword = $('#password1'),ocaptcha = $('#captcha');
+            if(ologinType[0].selectedIndex <= -1){
+                errortip('错误', '请选择帐号类型');
+                //ologinType.focus();
+                return false;
+            }
+            if(oAccountContent.val().length<1 || oAccountContent.val() == "请输入帐号"){
+                errortip('错误', '请输入帐号');
+                //oAccountContent.focus();
+                return false;
+            }
+            if(opassword.val().length<1){
+                errortip('错误', '请输入密码');
+                //opassword.focus();
+                return false;
+            }
+            if(ocaptcha.val().length<1 || ocaptcha.val() == "请输入验证码"){
+                errortip('错误', '请输入验证码');
+                //ocaptcha.focus();
+                return false;
+            }
+            return true;
+        }
+
+        function freshCaptcha() {
+            $("#imgCaptcha").attr("src", host + "/captcha.do?" + new Date().toString());
+        }
+
+        $(function() {
+            var tap = 'click';
+            if('ontouchend' in document.createElement('div')){
+                tap = 'touchend';
+            }
+            freshCaptcha();
+            $("#imgCaptcha").on(tap, function() {
+                freshCaptcha();
+            });
+            $("#login").on(tap, function() {
+                if(validateForm()){
+                    $("#password").val($('#password1').val());
+                    $('#password1').val('');
+                    if (exp != "" && md != "") {
+                        var key = RSAUtils.getKeyPair(exp, '', md);
+                        var psw = $("#password").val();
+                        $("#password").val(RSAUtils.encryptedString(key, psw));
+                    }
+                    $("#login").off(tap);
+                    $("#frmLogin").submit();
+                }
+            });
+            if($.trim($("#errMsg").html()).length < 1){
+                $("#errMsg").hide();
+            }
+            else{
+                $("#errMsg").addClass("show");
+                setTimeout(function(){$("#errMsg").addClass("hide")}, 500);
+            }
+
+            if(!('placeholder' in document.createElement('input'))){
+                $('#account_content').val('请输入账号')
+                .bind({
+                    'focus': function(){
+                        if($(this).val() == '请输入账号' ){
+                            $(this).val('');
+                        }
+                    },
+                    'blur': function(){
+                        if($.trim($(this).val()) == '' ){
+                            $(this).val('请输入账号');
+                        }
+                    }
+                });
+
+                $('#captcha').val('请输入验证码')
+                .bind({
+                    'focus': function(){
+                        if($(this).val() == '请输入验证码' ){
+                            $(this).val('');
+                        }
+                    },
+                    'blur': function(){
+                        if($.trim($(this).val()) == '' ){
+                            $(this).val('请输入验证码');
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,334 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="public/css/base${compressSuffix}.css?${version}">
+<title>撤单查询</title>
+<style type="text/css">
+html, body {
+	background: #fff;
+	height:100%;
+}
+.container{
+	top:0;
+	bottom:0;
+}
+.l{
+	float: left;
+}
+.trade-buttons{
+	list-style: none;
+	overflow: hidden;
+	margin-bottom: 10px;
+}
+.trade-buttons li{
+	width: 25%;
+	float: left;
+	text-align: center;
+}
+.form-buttons li{
+	width: 50%;
+}
+.button{
+	line-height: 50px;
+	font-size: 20px;
+	font-weight: 400;
+	border-radius: 8px;	
+	width: 95%;
+	letter-spacing: 4px;
+	background: #3B9AD9;
+	background: -webkit-linear-gradient(top,#3B9AD9, #3183C8);
+	background: -moz-linear-gradient(top,#3B9AD9, #3183C8);
+	background: linear-gradient(top,#3B9AD9, #3183C8);
+	color: #FFF;
+}
+.button:active{
+	background: #3183C8;
+	background: -webkit-linear-gradient(bottom,#3B9AD9, #3183C8);
+	background: -moz-linear-gradient(bottom,#3B9AD9, #3183C8);
+	background: linear-gradient(bottom,#3B9AD9, #3183C8);
+}
+.gray{
+	background: #a1a1a1;
+	background: -webkit-linear-gradient(top,#a1a1a1, #939393);
+	background: -moz-linear-gradient(top,#a1a1a1, #939393);
+	background: linear-gradient(top,#a1a1a1, #939393);
+}
+.gray:active{
+	background: #939393;
+	background: -webkit-linear-gradient(bottom,#a1a1a1, #939393);
+	background: -moz-linear-gradient(bottom,#a1a1a1, #939393);
+	background: linear-gradient(bottom,#a1a1a1, #939393);
+}
+.overlay{
+	display: none;
+	position: absolute;
+	z-index: 20;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0,0,0,0.3);
+}
+.box-title{
+	height: 40px;
+	line-height: 40px;
+	background: url(public/img/bannerback.png);
+	font-size: 14px;
+	font-weight: bold;
+	overflow: hidden;
+	background-size: contain;
+	color: white;
+	padding-left: 2%;
+}
+.out{
+	display: none;
+	position: absolute;
+	width: 300px;
+	/*height: 275px;*/
+	border-radius: 8px;
+	overflow: hidden;
+	background: #FFF;
+	z-index: 30;
+	font-size: 14px;
+	top: 40px;
+	margin: auto;
+	left: 0;
+	right: 0;
+}
+.out li{
+	list-style: none;
+}
+.box-content{
+	line-height: 1.9;
+	padding-left: 5%;
+	padding-top: 5px;
+	font-size: 12px;
+}
+.box-content li.warn{
+	color:red;
+	text-align:center;
+}
+.box-foot{
+	margin-top: 15px;
+}
+.box-foot .button{
+	line-height: 38px;
+	height: 40px;
+	font-size: 15px;
+	width: 90%;
+}
+#alertBox li{
+	width: 90%;
+	margin: auto;
+	float: none;
+}
+.holding-btn, li a {
+	display: inline-block;
+}
+@media only screen and (max-width: 400px){
+	.data td{
+		font-size:12px;
+	}
+}
+</style>
+</head>
+<body id="pageTrade" class="rel">
+<div class="container abs">
+  <form id="formTrade" name="formTrade" action="">
+  <input type="hidden" id="cusFields" value="3,2,6,7,8,5,4"><!--名称，代码，价格，委托数量，成交数量，委托方向，委托号-->
+  </form>
+    <div class="nav">
+        <div class="tab">
+            <span>撤单查询</span>
+            <div class="btn-back" onclick="top.location.href = '${rc.getContextPath()}/homePage.do?page=1'">返回</div>
+        </div>
+    </div>
+  <div class="content">
+    
+  </div>
+</div>
+<div class='overlay'></div>
+<div class='out'>
+  <div class='box-title'>
+    交易确认
+  </div>
+  <div class='box-content'>
+    <ul>
+      
+    </ul>
+  </div>
+  <div class='box-foot'>
+    <ul id='confirmBox' class='trade-buttons form-buttons'>
+      <li><a href='javascript:;' class='button' id='sure'>确定</a></li>
+      <li><a href='javascript:;' class='button gray' id='cancel'>取消</a></li>
+    </ul>
+    <ul id='alertBox' class='trade-buttons form-buttons'>
+      <li><a href='javascript:;' class='button'>确定</a></li>
+    </ul>
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="public/js/Common/Common${compressSuffix}.js?${version}"></script>
+<script type="text/javascript" src="public/js/zepto.min.js?${version}"></script>
+<script type='text/javascript' language="javascript">
+var tap = 'click', requestParam= {}, boxParam = [];
+var sBasePath = "${rc.getContextPath()}";
+if('ontouchend' in document.createElement('div')){
+	tap = 'touchend';
+}
+
+function DataBind(){
+	$(".content").empty();
+	$.ajax({
+		data: {
+			cusFields:$('#cusFields').val()		
+		},
+		url:sBasePath + "/todayOrderForCancel.do",
+		type: 'get',
+		dataType: 'json',
+		beforeSend: function(){
+			$(".load").show();
+		},
+		success: function(data){
+			$(".content").empty();
+			var ort, tr, table = '<table class="data" width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td class="dtitle center" nowrap>名称/代码</td><td class="dtitle" nowrap>价格</td><td class="dtitle" nowrap>数量</td><td class="dtitle" nowrap>成交</td><td class="dtitle center" nowrap>方向</td><td class="dtitle center" nowrap>操作</td></tr></table>';
+			if(data.errMsg == "" && data.data){
+				ort = data.data;
+				tr = '<tr><td class="center">{0}<br/><span class="code">{1}</span></td><td>{2}</td><td>{3}</td><td>{4}</td><td class="center">{5}</td><td class="center"><a class="btnCancel" dwth="{6}" href="javascript:;"><img src="public/img/ico02.png" width="19" /></a></td></tr>';
+				$(".content").append(table);
+				if(ort.length > 0)
+				{
+					for(var i = 0; i < ort.length; i++){
+						$(".content table.data").children().append(tr.format(ort[i][0],ort[i][1],ort[i][2],ort[i][3],ort[i][4],getFormtDirection(ort[i][5]),ort[i][6]));
+					}
+					$(".content a.btnCancel").bind('click', function(i){
+							requestParam = {
+								'entrust_no': $(this).attr("dwth"),
+								'ranID': "${ranID}"
+							},boxParam = {
+								title: '撤单确认',
+								mode: 'confirm',
+								data: ['是否确定撤单?']
+							};
+							Box.open(boxParam);
+					});
+				}
+				else{
+					$(".content table.data").children().append("<tr><td colspan=7 align=center><font color=red>没有找到任何数据!</font></td></tr>");
+				}
+			}
+			else{
+				$(".content").append(table).children().children().append("<tr><td colspan=7 align=center><font color=red>" + data.errMsg + "</font></td></tr>");
+			}
+		},
+		complete: function(){
+			$(".load").hide();
+		}
+	});
+}
+
+function getFormtDirection(v_sStatus){
+	if(v_sStatus == '买入'){
+		return '<font color="green">'+v_sStatus+'</font>';
+	}
+	else if(v_sStatus == '卖出'){
+		return '<font color="red">'+v_sStatus+'</font>';
+	}
+	return v_sStatus;
+}
+
+function orderCancel(){
+	$.ajax({
+		url:sBasePath + "/cancelOrder.do",
+		type: 'post',
+		data: requestParam,
+		dataType: 'json',
+		success: function(res){
+			var arr = [];
+			if(!res.errMsg){//成功
+				
+				for(var i=0; i<res.data.length; i++){
+					arr.push('返回消息'+'：'+res.data[i][1]);
+				}
+				Box.open({title: '提示', data: arr, mode: 'alert', callback: function(){window.location.reload();}});
+				
+			}else{//失败
+				Box.open({title: '提示', data: [res.errMsg], mode: 'alert', callback: function(){window.location.reload();}});
+			}
+		}
+	});
+}
+
+var Box = {
+	el: $('.out'),
+	layer: $('.overlay'),
+	open: function(param){
+		/*
+			{
+				title: string
+				data: []
+				callback: function
+				mode: string
+			}
+		*/
+		var $el = this.el, liHtml= '', top;
+		$el.find('.box-title').html(param['title']);
+		for(var i=0; i<param.data.length; i++){
+			liHtml += '<li>'+param.data[i]+'</li>'
+		}
+		if(param.warning){
+			liHtml += '<li class="warn">警告：'+param.warning+'</li>'
+		}
+		$el.find('.box-content ul').html(liHtml);
+		if(param.mode == 'confirm' /*&& typeof param.callback === 'function'*/){
+			$('#confirmBox').show();
+			$('#alertBox').hide();
+		}else{
+			$('#confirmBox').hide();
+			$('#alertBox').show();
+		}
+		this.closeCallback = null;
+		if(typeof param.callback === 'function'){
+			this.closeCallback = param.callback;
+		}
+		this.layer.show();
+		$el.show();
+		
+		top = $('body').scrollTop()+($(window).height()- $el.height())*0.5;
+	
+		$el.css('top', top+'px');
+		
+	},
+	close: function(){
+		this.el.hide();
+		this.layer.hide();
+		if(typeof this.closeCallback === 'function'){
+			this.closeCallback();
+		}
+	}
+}
+
+$('#sure').bind(tap, function(){
+	orderCancel(requestParam);
+	$('#cancel').trigger(tap);
+});
+
+$('#cancel').bind(tap, function(){
+	Box.close();
+});
+
+$('#alertBox a').bind(tap, function(){
+	$('#cancel').trigger(tap);
+});
+
+$(function(){
+		$("<div class='load'></div>").appendTo($("body")).hide();
+		DataBind();
+	});
+</script>
+</html>

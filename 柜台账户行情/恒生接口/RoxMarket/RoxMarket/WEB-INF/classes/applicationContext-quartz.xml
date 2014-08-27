@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+	ttp://www.springframework.org/schema/task  
+	http://www.springframework.org/schema/task/spring-task-3.1.xsd"
+	default-autowire="byName">
+
+	<!--  实时行情 -->
+	<bean id="marketJob" class="com.cfwx.rox.businesssync.market.job.MarketJob"></bean>
+
+	<bean id="marketJobtask"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<!-- 调用的类 -->
+		<property name="targetObject">
+			<ref bean="marketJob" />
+		</property>
+		<!-- 调用类中的方法 -->
+		<property name="targetMethod">
+			<value>updateMarketInfo</value>
+		</property>
+		 <!-- 设置为串行 -->
+		<property name="concurrent" value="false" />
+	</bean>
+
+	<bean id="marketTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean"
+		autowire="no">
+		<property name="jobDetail">
+			<ref bean="marketJobtask" />
+		</property>
+	   <property name="repeatInterval">  
+ 		<value>3000</value>
+	  </property>  
+	</bean>
+	<!-- 实时行情 -->
+	
+	<!-- 分时数据 -->
+	<bean id="workJob" class="com.cfwx.rox.businesssync.market.job.WorkJob"></bean>
+
+	<bean id="workJobtask"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<!-- 调用的类 -->
+		<property name="targetObject">
+			<ref bean="workJob" />
+		</property>
+		<!-- 调用类中的方法 -->
+		<property name="targetMethod">
+			<value>write</value>
+		</property>
+		<!-- 设置为串行 -->
+		<property name="concurrent" value="false" />
+	</bean>
+
+	<bean id="workTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean"
+		autowire="no">
+		<property name="jobDetail">
+			<ref bean="workJobtask" />
+		</property>
+		<property name="startDelay">
+		<value>10000</value>
+		</property>
+	   <property name="cronExpression">  
+		<value>0 0/1 * * * ?</value>
+	  </property>  
+	</bean>
+	<!-- 行情信息 -->
+	
+	<bean id="syncQuartzFactory"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean"
+		autowire="no">
+		<property name="triggers">
+			<list>
+				<ref bean="marketTrigger" />
+				<ref bean="workTrigger" />
+			</list>
+		</property>
+	</bean>
+</beans>

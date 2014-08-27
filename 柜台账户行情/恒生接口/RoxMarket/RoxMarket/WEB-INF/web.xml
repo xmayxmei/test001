@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+  <display-name>RoxMarket</display-name>
+  <welcome-file-list>
+    <welcome-file>index.do</welcome-file>
+    <welcome-file>htmlTest.html</welcome-file>
+  </welcome-file-list>
+  <filter>
+    <filter-name>setCharacterEncoding</filter-name>
+    <filter-class>
+	        org.springframework.web.filter.CharacterEncodingFilter
+	    </filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+  </filter>
+
+  <servlet>
+    <servlet-name>Spring</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>
+				classpath:applicationContext.xml
+	  </param-value>
+    </init-param>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Spring</servlet-name>
+    <url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 分时 -->
+  <servlet>
+    <servlet-name>timeshare</servlet-name>
+    <servlet-class>com.cfwx.rox.businesssync.market.servlet.TimeShareServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>timeshare</servlet-name>
+    <url-pattern>/timeshare</url-pattern>
+  </servlet-mapping>
+   <!-- 五档行情 -->
+  <servlet>
+    <servlet-name>fivePrice</servlet-name>
+    <servlet-class>com.cfwx.rox.businesssync.market.servlet.FivePriceServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>fivePrice</servlet-name>
+    <url-pattern>/fivePrice</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 行情排行 -->
+  <servlet>
+    <servlet-name>market</servlet-name>
+    <servlet-class>com.cfwx.rox.businesssync.market.servlet.MarketServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>market</servlet-name>
+    <url-pattern>/market</url-pattern>
+  </servlet-mapping>
+  
+  <!-- K线数据 -->
+  <servlet>
+    <servlet-name>klinedaily</servlet-name>
+    <servlet-class>com.cfwx.rox.businesssync.market.servlet.KLineDailyServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>klinedaily</servlet-name>
+    <url-pattern>/klinedaily</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 周K线数据 -->
+  <servlet>
+    <servlet-name>kLineWeeklyServlet</servlet-name>
+    <servlet-class>com.cfwx.rox.businesssync.market.servlet.KLineWeeklyServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>kLineWeeklyServlet</servlet-name>
+    <url-pattern>/klineweekly</url-pattern>
+  </servlet-mapping>
+  
+    <!-- 月K线数据 -->
+  <servlet>
+    <servlet-name>kLineMonthlyServlet</servlet-name>
+    <servlet-class>com.cfwx.rox.businesssync.market.servlet.KLineMonthlyServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>kLineMonthlyServlet</servlet-name>
+    <url-pattern>/klinemonthly</url-pattern>
+  </servlet-mapping>  
+  
+  <!-- 年K线数据 -->
+  <servlet>
+    <servlet-name>kLineYearlyServlet</servlet-name>
+    <servlet-class>com.cfwx.rox.businesssync.market.servlet.KLineYearlyServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>kLineYearlyServlet</servlet-name>
+    <url-pattern>/klineyearly</url-pattern>
+  </servlet-mapping>
+  
+      <!-- 10MinK线数据 -->
+  <servlet>
+    <servlet-name>kline5MinServlet</servlet-name>
+    <servlet-class>com.cfwx.rox.businesssync.market.servlet.Kline5MinServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>kline5MinServlet</servlet-name>
+    <url-pattern>/kline5min</url-pattern>
+  </servlet-mapping>
+  
+    <!-- 10MinK线数据 -->
+  <servlet>
+    <servlet-name>kline10MinServlet</servlet-name>
+    <servlet-class>com.cfwx.rox.businesssync.market.servlet.Kline10MinServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>kline10MinServlet</servlet-name>
+    <url-pattern>/kline10min</url-pattern>
+  </servlet-mapping>
+  
+      <!-- 15MinK线数据 -->
+  <servlet>
+    <servlet-name>kline15MinServlet</servlet-name>
+    <servlet-class>com.cfwx.rox.businesssync.market.servlet.Kline15MinServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>kline15MinServlet</servlet-name>
+    <url-pattern>/kline15min</url-pattern>
+  </servlet-mapping>
+  
+      <!-- 30MinK线数据 -->
+  <servlet>
+    <servlet-name>kline30MinServlet</servlet-name>
+    <servlet-class>com.cfwx.rox.businesssync.market.servlet.Kline30MinServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>kline30MinServlet</servlet-name>
+    <url-pattern>/kline30min</url-pattern>
+  </servlet-mapping>
+  
+       <!-- 60MinK线数据 -->
+  <servlet>
+    <servlet-name>kline60MinServlet</servlet-name>
+    <servlet-class>com.cfwx.rox.businesssync.market.servlet.Kline60MinServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>kline60MinServlet</servlet-name>
+    <url-pattern>/kline60min</url-pattern>
+  </servlet-mapping>
+  
+   <!-- 我的关注 -->
+  <servlet>
+    <servlet-name>myFollow</servlet-name>
+    <servlet-class>com.cfwx.rox.businesssync.market.servlet.MyFollowServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>myFollow</servlet-name>
+    <url-pattern>/myFollow</url-pattern>
+  </servlet-mapping>
+</web-app>

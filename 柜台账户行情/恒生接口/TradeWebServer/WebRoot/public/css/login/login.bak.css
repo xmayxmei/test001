@@ -1,0 +1,13 @@
+.logo{
+margin:30px auto;
+text-align:center;
+}
+.logo img{
+min-width:250px;
+width:250px;
+}
+.outter .inner {
+position:absolute;
+left:0;
+right:100px;
+}

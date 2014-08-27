@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>股票交易</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1, minimum-scale=1.0, maximum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+      <script src="public/js/zepto.min.js?${version}"></script>
+      <link rel="stylesheet" type="text/css" href="public/css/base${compressSuffix}.css?${version}">
+      <link rel="stylesheet" type="text/css" href="public/css/home/home${compressSuffix}.css?${version}">
+    <link href="public/css/bottom${compressSuffix}.css?${version}" rel="stylesheet" />
+	<#assign  basePath>${rc.getContextPath()}</#assign>
+	
+	<#if page??>
+		<#assign  cpage>${page}</#assign>
+	<#else>
+		<#assign  cpage>1</#assign>
+	</#if>
+<script>
+	var vPage = ${page};
+	  function toggleTab(v_index){
+		$(".topmenu>a").removeClass("mnuFocus").addClass("mnuLost");
+		$(".topmenu>a").eq(v_index).removeClass("mnuLost").addClass("mnuFocus");
+	}
+	$(function() {
+		toggleTab(vPage - 1);
+	});
+</script>
+</head>
+  <body>
+  	<div class="topmenu">
+  		<a href="${basePath}/homePage.do?page=1">交易</a>
+  		<a href="${basePath}/homePage.do?page=2">查询</a>
+  		<a href="${basePath}/homePage.do?page=3">银证转账</a>
+  		<a href="${basePath}/homePage.do?page=4">账号</a>
+  	</div>
+	<div class="divCenter">
+	    <#if cpage == "1">
+		<div id="trade" class="lb">
+			<div class="line" align="center">
+				<div class="cell" align="center">
+				<a href="${basePath}/limitBuyPage.do"><img src="public/img/0.png" id="wtBid"/></a><br>
+				<span>委托买入</span>
+				</div>
+				<div class="cell" align="center">
+				<a href="${basePath}/limitSellPage.do"><img src="public/img/1.png" id="wtAsk"/></a><br>
+				<span>委托卖出</span>
+				</div>
+				<div class="cell" align="center">
+				<a href="${basePath}/marketBuyPage.do"><img src="public/img/2.png" id="sjBid"/></a><br>
+				<span>市价买入</span>
+				</div>
+			</div>
+			<div class="line" align="center"> 
+					<div class="cell" align="center">
+					<a href="${basePath}/marketSellPage.do"><img src="public/img/3.png" id="sjAsk"/></a><br>
+					<span>市价卖出</span>
+					</div>
+					<!-- <div class="cell" align="center">
+					<a href="${basePath}/specifiedTradePage.do"><img src="public/img/4.png" id="zdTrade"/></a><br>
+					<span>指定交易</span>
+					</div> -->
+					<div class="cell" align="center">
+					<a href="${basePath}/ipo.do"><img src="public/img/5.png" id="ipo"/></a><br>
+					<span>新股申购</span>
+					</div>
+					<div class="cell" align="center">
+					<a href="${basePath}/cancelOrderPage.do"><img src="public/img/6.png" id="cancelOrder"/></a><br>
+					<span>撤单查询</span>
+					</div>
+			</div>
+			
+		</div>
+		<#elseif cpage == "2">
+		<div id="query" class="lb">
+			<div class="line" align="center">
+				<div class="cell" align="center">
+				<a href="${basePath}/fundsPage.do"><img src="public/img/7.png" id="zjQuery"/></a><br>
+				<span>资金查询</span>
+				</div>
+				<div class="cell" align="center">
+				<a href="${basePath}/holdStockPage.do"><img src="public/img/8.png" id="holdStock"/></a><br>
+				<span>股票持仓</span>
+				</div>
+				<div class="cell" align="center">
+				<a href="${basePath}/todayOrderPage.do"><img src="public/img/9.png" id="todayOrder"/></a><br>
+				<span>当日委托</span>
+				</div>
+			</div>
+			<div class="line" align="center"> 
+				<div class="cell" align="center">
+				<a href="${basePath}/todayTransPage.do"><img src="public/img/10.png" id="todayTrans"/></a><br>
+				<span>当日成交</span>
+				</div>
+				<div class="cell" align="center">
+				<a href="${basePath}/fundsFlowPage.do"><img src="public/img/11.png" id="fundsDTQuery"/></a><br>
+				<span>资金流水查询</span>
+				</div>
+				<div class="cell" align="center">
+				<a href="${basePath}/hisOrderPage.do"><img src="public/img/12.png" id="hisOrder"/></a><br>
+				<span>历史委托</span>
+				</div>
+			</div>
+			<div class="line" align="center">
+				<div class="cell" align="center">
+				<a href="${basePath}/hisTransaction.do"><img src="public/img/13.png" id="hisTrans"/></a><br>
+				<span>历史成交</span>
+				</div>
+				
+				<div class="cell" align="center">
+				<a href="${basePath}/peihaoPage.do"><img src="public/img/14.png" id="phQuery"/></a><br>
+				<span>配号查询</span>
+				</div>
+				
+				<div class="cell" align="center">
+				<a href="${basePath}/ballotPage.do"><img src="public/img/15.png" id="zqQuery"/></a><br>
+				<span>中签查询</span>
+				</div>
+			</div>
+		</div>
+		<#elseif cpage == "3">
+		<div id="yzzz" class="lb">
+			<div class="line" align="center">
+				<div class="cell" align="center">
+				<a href="${basePath}/bankToZQPage.do"><img src="public/img/16.png" id="bank2zq"/></a><br>
+				<span>银行转证券</span>
+				</div>
+				<div class="cell" align="center">
+				<a href="${basePath}/ZQToBankPage.do"><img src="public/img/17.png" id="zq2bank"/></a><br>
+				<span>证券转银行</span>
+				</div>
+				<div class="cell" align="center">
+				<a href="${basePath}/dayFundsFlow.do"><img src="public/img/18.png" id="todayDT"/></a><br>
+				<span>银行流水</span>
+				</div>
+			</div>
+		</div>
+		<#elseif cpage == "4">
+		<div id="acc" class="lb">
+			<div class="line" align="center">
+				<div class="cell" align="center">
+				<a href="${basePath}/changePsw.do"><img src="public/img/19.png" id="wtBid"/></a><br>
+				<span>密码修改</span>
+				</div>
+				<div class="cell" align="center">
+				<a href="${basePath}/logout.do"><img src="public/img/20.png" id="logout"/></a><br>
+				<span>退出</span>
+				</div>
+				<div class="cell" align="center">
+				</div>
+			</div>
+		</div>
+		</#if>
+	</div>
+    <div style="height:45px;"></div>
+    <#include "../common/bottom.html">
+</body>
+  <script type="text/javascript">
+		$(function(){
+			function setHeight(){
+				$('.cell').each(function(index, element) {
+					var h = ($(this).width() - $(this).find('img').width()) / 2;
+					h = h > 100 ? 100 : h + 10;
+					$(this).css({
+						'padding-top':h + 'px'
+					});
+				});
+			}
+			setHeight();
+			$(window).bind('resize', function(){
+				setHeight();
+			});	
+		});
+  </script>
+</html>

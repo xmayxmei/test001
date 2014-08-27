@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t2sdk-configuration>
+	<performance   heartbeatTime="400"
+		           acquireConnWaitTime="3000"  registerTime="5" reconnInterval="3"
+		           localServerName="mctest"   callBackTime="5000" enmCompress="true" />
+    <parents>    
+		<parent  parentName="myserver" safeLevel="NONE">
+			<limit licenseFile="c:\Hundsun\HsAdmin\Bin\FBaseAdmin\Config\client_license.dat" encrypt="HSBlowfish" />
+			<members>
+				<member no="5" address="192.168.94.43" port="8002"
+				  charset="gbk" poolSize="1" />
+			</members>
+		</parent>
+	</parents>
+	<callBackMethods>
+		<method id="3" className="com.jres.test.CallBack" />
+	</callBackMethods>
+	<logAdapter className="com.hundsun.t2sdk.impl.util.CommonLogAdapter" />
+</t2sdk-configuration>

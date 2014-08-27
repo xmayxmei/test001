@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="TradeGateway"
+  id="myeclipse.1398654518683"
+  context-root="/TradeGateway"
+  j2ee-spec="6.0"
+  archive="TradeGateway.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="public/css/base${compressSuffix}.css?${version}">
+    <link rel="stylesheet" href="public/css/pickdate${compressSuffix}.css?${version}">
+<title>委托查询-历史委托</title>
+<style type="text/css">
+html, body {
+	background: #fff;
+}
+</style>
+</head>
+<body id="pageTrade">
+<div class="container">
+  <div class="nav">
+      <div class="tab">
+          <span>历史委托</span>
+          <div class="btn-back" onclick="top.location.href = '${rc.getContextPath()}/homePage.do?page=2'">返回</div>
+      </div>
+  </div>
+  <form id="formTrade" name="formTrade" action="">
+  <input type="hidden" id="cusFields" value="5,4,8,9,7,16,20">
+    <div class="search-date">
+      <div class="date-wrap">
+        <div class="left">
+          <div class="ds"><div id="start_date" name="start_date" class="input-def input-date input-shadow"></div></div>
+          <div class="de"><div id="end_date" name="end_date" class="input-def input-date input-shadow"></div></div>
+          <div class="mid">至</div>
+        </div>
+        <div class="search-icon" onClick="validateDate();">
+          <div class="circle"></div>
+          <div class="hander"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="content">
+    
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="public/js/Common/Common${compressSuffix}.js?${version}"></script>
+<script type="text/javascript" src="public/js/zepto.min.js?${version}"></script>
+<script type="text/javascript" src="public/js/Common/jMessage${compressSuffix}.js?${version}"></script>
+<script type="text/javascript" src="public/js/Common/pickadate${compressSuffix}.js?${version}"></script>
+<script type='text/javascript' language="javascript">
+function validateDate(){
+	var start_date = $.trim($('#start_date').text()),
+	end_date = $.trim($('#end_date').text());
+	if((start_date.length <=0 || start_date == "yyyymmdd") || (end_date.length <= 0 || end_date == "yyyymmdd")){
+		jMessage.open({title: '', content: '请输入日期', model: 'alert', autoHide: true});
+		return false;
+	}
+	if(!(/^\d{8}$/.test(start_date)) || !(/^\d{8}$/.test(end_date))){
+		jMessage.open({title: '', content: '日期输入错误', model: 'alert', autoHide: true});
+		return false;
+	}
+	else if(!formatteDate(start_date) || !formatteDate(end_date)){
+		jMessage.open({title: '', content: '日期输入错误', model: 'alert', autoHide: true});
+		return false;
+	}
+	DataBind();
+}
+
+function DataBind(){
+	var sBasePath = "${rc.getContextPath()}";
+	$(".content").empty();
+	$.ajax({
+		data: {
+			start_date:$.trim($('#start_date').text()),
+			end_date:$.trim($('#end_date').text()),
+			cusFields:$('#cusFields').val()		
+		},
+		url:sBasePath + "/historyOrder.do",
+		type: 'get',
+		dataType: 'json',
+		beforeSend: function(){
+			$(".load").show();
+		},
+		success: function(data){
+			$(".content").empty();
+			var ort, tr, table = '<table class="data" width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td class="dtitle center" nowrap>名称/代码</td><td class="dtitle" nowrap>价格</td><td class="dtitle" nowrap>数量</td><td class="dtitle center" nowrap>方向</td><td class="dtitle center" nowrap>日期</td><td class="dtitle center" nowrap>状态</td></tr></table>';
+			if(data.errMsg == "" && data.data){
+				ort = data.data;
+				tr = '<tr><td class="center">{0}<br/><span class="code">{1}</span></td><td>{2}</td><td>{3}</td><td class="center">{4}</td><td class="center">{5}</td><td class="center">{6}</td></tr>';
+				$(".content").append(table);
+				if(ort.length > 0)
+				{
+					for(var i = 0; i < ort.length; i++){
+						$(".content table.data").children().append(tr.format(ort[i][0],ort[i][1],ort[i][2],ort[i][3],ort[i][4],ort[i][5],ort[i][6]));
+					}
+				}
+				else{
+					$(".content table.data").children().append("<tr><td colspan=6 align=center><font color=red>没有找到任何数据!</font></td></tr>");
+				}
+			}
+			else{
+				$(".content").append(table).children().children().append("<tr><td colspan=6 align=center><font color=red>" + data.errMsg + "</font></td></tr>");
+			}
+		},
+		complete: function(){
+			$(".load").hide();
+		}
+	});
+}
+
+function getFormtStatus(v_sStatus){
+	var tmp = '<img src="public/img/ico02.png" width="19">', iTa = parseInt(v_sStatus);
+	if(iTa && iTa == 6){
+		tmp = '<img src="public/img/ico01.png" width="19">';
+	}
+	return tmp;
+}
+
+$(function(){
+		$('#start_date,#end_date').text('yyyymmdd').css('color', '#ccc');
+		$("<div class='load'></div>").appendTo($("body")).hide();
+		$("#start_date").datepicker({onSelect:function(d){
+			$("#end_date").datepicker('option', 'minDate', d);
+		}});
+		$("#end_date").datepicker({onSelect:function(d){
+			$("#start_date").datepicker('option', 'maxDate', d);
+		}});
+	});
+</script>
+</html>

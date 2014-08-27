@@ -1,0 +1,696 @@
+﻿<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+  <meta name="format-detection" content="telephone=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>市价买入</title>
+    <link type='text/css' rel='stylesheet' href='public/css/buyOrSell${compressSuffix}.css?${version}' />
+</head>
+
+<body onselectstart="return false;">
+
+    <div class='body'>
+        <div class="buy_nav">
+            <img src="public/img/buy_user.png" class="l"> <span id='mc'></span>
+            <div class="btn-back" onclick="top.location.href = '/TradeWebServer/homePage.do?page=1'">返回</div>
+        </div>
+        <div class="trade-area">
+            <div class='trade-control'>
+
+                <div id='selectGdh'>
+                    <select></select>
+                </div>
+                <div>
+                    <input name="stockCode" id='stockCode' type="tel" maxlength="6" placeholder="股票代码">
+                </div>
+                <div id="selectPriceType">
+                    <select id="PriceType" name="PriceType"></select>
+                </div>
+                <div style='line-height: 34px;font-size: 14px;white-space: nowrap;'>
+                    <img src="public/img/number.png" width="32" height="32" class="l">&nbsp;可买(股)：<span id='availableNum'></span>
+                </div>
+                <div>
+                    <input name="" type="tel" id='buyOrSellNum' placeholder="购买股数">
+                </div>
+            </div>
+            <div class='trade-info'>
+                <table>
+                    <tr>
+                        <td>卖五</td>
+                        <td id='s5Price'>--</td>
+                        <td id='s5'>--</td>
+                    </tr>
+                    <tr>
+                        <td>卖四</td>
+                        <td id='s4Price'>--</td>
+                        <td id='s4'>--</td>
+                    </tr>
+                    <tr>
+                        <td>卖三</td>
+                        <td id='s3Price'>--</td>
+                        <td id='s3'>--</td>
+                    </tr>
+                    <tr>
+                        <td>卖二</td>
+                        <td id='s2Price'>--</td>
+                        <td id='s2'>--</td>
+                    </tr>
+                    <tr>
+                        <td>卖一</td>
+                        <td id='s1Price'>--</td>
+                        <td id='s1'>--</td>
+                    </tr>
+                </table>
+                <table>
+                    <tr>
+                        <td>买一</td>
+                        <td id='b1Price'>--</td>
+                        <td id='b1'>--</td>
+                    </tr>
+                    <tr>
+                        <td>买二</td>
+                        <td id='b2Price'>--</td>
+                        <td id='b2'>--</td>
+                    </tr>
+                    <tr>
+                        <td>买三</td>
+                        <td id='b3Price'>--</td>
+                        <td id='b3'>--</td>
+                    </tr>
+                    <tr>
+                        <td>买四</td>
+                        <td id='b4Price'>--</td>
+                        <td id='b4'>--</td>
+                    </tr>
+                    <tr>
+                        <td>买五</td>
+                        <td id='b5Price'>--</td>
+                        <td id='b5'>--</td>
+                    </tr>
+                </table>
+
+
+            </div>
+            <div style='clear: both'></div>
+            <ul class='trade-buttons' id='buyOrSellBtn'>
+                <li><a class='holding-btn' href='javascript:;' dq='4'>1/4仓</a></li>
+                <li><a class='holding-btn' href='javascript:;' dq='3'>1/3仓</a></li>
+                <li><a class='holding-btn' href='javascript:;' dq='2'>1/2仓</a></li>
+                <li><a class='holding-btn' href='javascript:;' dq='1'>全仓</a></li>
+            </ul>
+            <ul class='trade-buttons form-buttons'>
+                <li><a href='javascript:;' class='button' id='submit'>提交</a></li>
+                <li><a href='javascript:;' class='button gray' id='reset'>重置</a></li>
+            </ul>
+            <div class='stock-grid'>
+                <table>
+                    <tr>
+                        <th>名称/代码</th>
+                        <th>股份/可用</th>
+                        <th>成本价/现价</th>
+                    </tr>
+                </table>
+                <table id='holding-grid'></table>
+            </div>
+        </div>
+        <div class='overlay'></div>
+    </div>
+
+    <div class='out'>
+        <div class='box-title'>
+            交易确认
+        </div>
+        <div class='box-content'>
+            <ul></ul>
+        </div>
+        <div class='box-foot'>
+            <ul id='confirmBox' class='trade-buttons form-buttons'>
+                <li><a href='javascript:;' class='button' id='sure'>确定</a></li>
+                <li><a href='javascript:;' class='button gray' id='cancel'>取消</a></li>
+            </ul>
+            <ul id='alertBox' class='trade-buttons form-buttons'>
+                <li><a href='javascript:;' class='button'>确定</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+
+<script type='text/javascript' src='public/js/zepto.min.js?${version}'></script>
+<script type="text/javascript" src="public/js/Common/jMessage${compressSuffix}.js?${version}"></script>
+<script type='text/javascript'>
+	
+	$(function(){
+		
+	
+		var tap = 'click', 
+			mousedown = 'mousedown',
+			availableMoney, //可用资金，每次都需要获取 
+			stockholderAccount = [], // 股东账号
+			ws, // websocket
+			timer, //
+			firstTime = true,
+			requestParam, //下单数据
+			WSURL = "${wsURL}",
+			AJAXURL = "${rc.getContextPath()}/getFData.do",
+			ranID = "${ranID}",
+			entrust_prop = "${entrust_prop}",
+			entrust_bs = "${entrust_bs}",
+			entrust_type = "${entrust_type}",
+			stockCode;
+		var arrPriceType = [["五档即成剩余撤销:U","五档即成剩余转限:R"],["本方最优价:S","对手方最优价:Q","即成否则撤销:T","五档即成否则撤销:U","全部成交否则撤销:V"]]
+		
+		// 手机触屏
+		if('ontouchend' in document.createElement('div')){
+			tap = 'touchend';
+			mousedown = 'touchstart';
+		}
+		
+		$('#buyOrSellBtn a').bind(tap, function(){
+			var availableNum = $('#availableNum').text();
+			$('#buyOrSellNum').val(Math.floor(availableNum/$(this).attr('dq')/100) * 100);
+		
+		});
+		// 快捷选价格
+		if(tap === 'touchend'){
+			$('.trade-info tr').bind({
+				'touchstart': function(){
+					$(this).css('background','#BDF1F8');
+				},
+				'touchend': function(){
+					$('.trade-info tr').css('background','transparent');
+				}
+		
+			});
+		}else{
+			$('.trade-info tr').bind({
+				
+				// 支持鼠标事件使用
+				'mouseover': function(){
+					$(this).css('background','#BDF1F8');
+				},
+				'mouseout': function(){
+					$('.trade-info tr').css('background','transparent');
+				}
+			});
+		}
+		
+		
+		// 提交买卖表单
+		$('#submit').bind(tap, function(){
+			// 买入或者卖出价格
+			var stockCode = $.trim($('#stockCode').val()),
+				availableNum = $('#availableNum').text(),
+				buyOrSellNum = $('#buyOrSellNum').val();
+			// 股票代码
+			if(!/^\d{6}$/.test(stockCode)){
+				jMessage.open({title: '', content: '股票代码格式不对', model: 'alert', autoHide: true});
+				//$('#stockCode').focus();
+				return ;
+			}
+			// 判断购买数量是否合法
+			else if(isNaN(buyOrSellNum)|| buyOrSellNum<1 || !/^\d+$/.test(buyOrSellNum)){
+				jMessage.open({title: '', content: '请输入正确的股数', model: 'alert', autoHide: true});
+				//$('#buyOrSellNum').focus();
+				return ;
+			}
+			requestParam = {
+				'ranID' : ranID,//随机码
+				'gdh': $("#selectGdh option").filter(function(index) {return this.selected}).text().split('-')[1],	//股东号
+				'jys': $("#selectGdh option").filter(function(index) {return this.selected}).attr('jys'),	//交易所
+				'stock_code': stockCode,	//证券代码
+				'entrust_bs': entrust_bs,	//交易类别 1 为买入 ， 2为卖出
+				'entrust_type' : entrust_type,
+				'entrust_amount': buyOrSellNum,	//委托数量
+				'entrust_price' : '1',
+				/*'wtjg': price,	//委托价格*/
+				'entrust_prop': $("#selectPriceType option").filter(function(index) {return this.selected}).val() 	//订单类型
+			};
+			
+			var msg = '';
+			if(buyOrSellNum - 0 > availableNum - 0){
+				msg = '购买股数大于可买股数，可能会导致交易失败!';
+			}
+			else if(buyOrSellNum % 100 != 0){
+				msg = '购买股数必须是100的整数倍，可能会导致交易失败!';
+			}
+			
+			var data =['股东代码：'+requestParam.gdh,
+				'证券名称：'+$('#mc').text(),
+				'证券代码：'+requestParam.stock_code,
+				/*'委托价格：'+requestParam.wtjg,*/
+				'委托数量：'+requestParam.entrust_amount,
+				'委托方式：'+$("#selectPriceType option").filter(function(index) {return this.selected}).text(),
+				'操作方式：市价买入'],
+				boxParam = {
+					title: '交易确认',
+					warning: msg,
+					mode: 'confirm',
+					data: data
+				};
+				
+			Box.open(boxParam);
+			/*
+			$('.box-content ul').html(s);
+
+			var h = $('body').scrollTop()+($(window).height()- 300)*0.5;
+			
+			$('.out').css('top', h+'px');
+			$('.overlay, .out').show();
+			*/
+			
+			
+		});
+		
+		$('#sure').bind(tap, function () {
+		    $('#submit').text('提交中……');
+		    $('#submit').unbind();
+			buyOrSell(requestParam);
+			$('#cancel').trigger(tap);
+		});
+		
+		$('#cancel').bind(tap, function(){
+			Box.close();
+		});
+		
+		$('#alertBox a').bind(tap, function(){
+			$('#cancel').trigger(tap);
+		});
+		
+		$('#selectGdh select').bind('change', function(){
+			initDelegatePriceType();
+		});
+		
+		//监听股票代码输入框
+		
+		$('#stockCode').bind({
+			'input': function(){
+				var val = $.trim(this.value), ophtml = '';
+				if(ws){
+					ws.destroy();
+				}
+				clearBuyAngSellInfo();
+				// 为空
+				if(!val){
+					initStockholderAccount();
+					
+					return ;
+				}
+				this.value=this.value.replace(/[^\d]/g,'');
+				if(!/^\d{6}$/.test(val)){
+					return ;
+				}
+				firstTime = true;
+				searchStockBuyOrSellInfoByCode(val);
+				
+			}
+		});
+		$('#buyOrSellNum').bind({
+			'input': function(){
+				this.value=this.value.replace(/[^\d]/g,'');
+			}
+		});
+		
+		$('#reset').bind(tap, function(){
+			reset();
+		});
+		
+		// socket通道
+		var SocketChannel = function(){
+			this.init.apply(this,arguments);
+		};
+		
+		SocketChannel.prototype = {
+			config:{},
+			init: function(wsurl, ajaxurl){
+				var self = this;
+				if(this.ws){
+					this.destroy();
+				}
+				// andriod系统微信有websocket对象，但是功能好像没有实现
+				if($.os.android){
+					this.ws = function(){
+						$.ajax({
+							type: 'get',
+							url: ajaxurl, 
+							dataType: 'json',
+							success: function(res){
+								self._render(res);
+							}
+						});
+						if(typeof self.ws == 'function')
+							 window.setTimeout(function(){
+								if(typeof self.ws == 'function')
+									self.ws();
+							}, 6000);
+					};
+					this.ws();
+				}else{
+					try{
+						
+						this.ws = new WebSocket(wsurl); 
+					}catch(e){
+						try{
+							
+							this.ws = new MozWebSocket(wsurl); 
+							
+						}catch(er){
+							this.ws = function(){
+								$.ajax({
+									type: 'get',
+									url: ajaxurl, 
+									dataType: 'json',
+									success: function(res){
+										self._render(res);
+									}
+								});
+								if(typeof self.ws == 'function')
+									 window.setTimeout(function(){
+										self.ws();
+									}, 6000);
+							};
+							this.ws();
+							//alert('您的浏览器版本太低');
+						}
+						
+					}
+				
+				}
+				
+				
+				if(this.ws.url){
+					this.ws.onmessage = function(evt) { 
+						self._render(JSON.parse(evt.data).stockData);
+						  
+					}; 
+
+					this.ws.onclose = function() { 
+						
+					}; 
+
+					this.ws.onopen = function() { 
+						console.log('websocket connect success...')
+					};
+				}
+				 
+			},
+			destroy: function(){
+				if(this.ws){
+					try{
+						this.ws.close&&this.ws.close();
+					}finally{
+						this.ws = null;
+					}
+				}
+				
+			},
+			_render: function(stockData){
+				var stockObject= stockData;
+
+				//console.log(stockObject);
+				
+				// 计算可买数目
+				if(availableMoney && stockObject['s1Price'] - 0){
+					try{
+						$('#availableNum').text(Math.floor(availableMoney/stockObject['s1Price']));
+					}catch(e){
+					
+					}
+				}
+				// 填充数据
+				renderBuyAngSellInfo(stockObject)
+			}
+		};
+		// 根据code查询股票买卖5信息
+		function searchStockBuyOrSellInfoByCode(code){
+			var wsurl = WSURL+'?code='+code,
+				ajaxurl = AJAXURL+'?code='+code;
+			
+			if(ws){
+				ws.destroy();
+			}
+			ws = new SocketChannel(wsurl, ajaxurl);
+	
+		}
+		// 下单买入或者卖出
+		function buyOrSell(param){
+			$.ajax({
+				url: '${rc.getContextPath()}/placeOrder.do',
+				type: 'get',
+				data: param,
+				dataType: 'json',
+				success: function(res){
+					if(!res.errMsg){//成功
+						var arr = [], a = ["返回码","返回消息","委托号"];
+						for(var i=0; i<res.data[0].length; i++){
+							arr.push(a[i]+'：'+res.data[0][i]);
+						}
+						Box.open({title: '提示', data: arr, mode: 'alert', callback: function(){window.location.reload();}});
+					}else{//失败
+					   var arr = [];
+					   arr[0] =  res.errMsg;
+					   Box.open({title: '提示', data: arr, mode: 'alert', callback: function(){window.location.reload();}});
+					}
+				}
+			});
+		} 
+		//切换股东账号
+		function toggleStockholderAccount(code){
+			for(var i=0; i<stockholderAccount.length; i++){
+				if(stockholderAccount[i][1].toLowerCase() == code.toLowerCase()){
+					$('#selectGdh select').html('<option jys="'+stockholderAccount[i][1]+'">'+stockholderAccount[i][0]+'</option>');
+					break;
+				}
+			}
+			$('#selectGdh select').trigger('change');
+		}
+		// 查询可用资金
+		function getAvailableMoney(){
+		
+			$.ajax({
+				url: '${rc.getContextPath()}/queryFunds.do',
+				type: 'get',
+				data:{
+				},
+				dataType: 'json',
+				success: function(res){
+					
+					if(!res.errMsg){
+						availableMoney = res.data[0][2] - 0;
+					}
+				}
+			});
+		
+		}
+		//获取股东信息
+		function getStockholderInfo(){
+			
+			$.ajax({
+				url: '${rc.getContextPath()}/gdhQuery.do',
+				type: 'get',
+				data:{
+					cusFields : '2,0'
+				},
+				dataType: 'json',
+				success: function(res){
+					if(!res.errMsg){
+						var marketCode;
+						// 保存股东账号
+						stockholderAccount = res.data.slice(0);
+						
+						for(var i=0; i<stockholderAccount.length; i++){
+							if(stockholderAccount[i][1].toLowerCase() == 'sh'){
+								marketCode = '沪A';
+							}else if(stockholderAccount[i][1].toLowerCase() == 'hb'){
+								marketCode = '沪B';
+							}else if(stockholderAccount[i][1].toLowerCase() == 'sz'){
+								marketCode = '深A';
+							}else if(stockholderAccount[i][1].toLowerCase() == 'sb'){
+								marketCode = '深B';
+							}else{
+								marketCode = '';
+							}
+							stockholderAccount[i][0] = marketCode+'-'+stockholderAccount[i][0];
+						}
+						// 初试化下拉中的股东号
+						initStockholderAccount();
+					}
+				}
+			});
+			
+		}
+
+		// 持仓查询
+		function holding(){
+			var tpl = '<tr>'
+						+'<td><div>$name</div><div>$code</div></td>'
+						+'<td><div>$sum</div><div>$available</td>'
+						+'<td><div>$cost</div><div>$newPrice</td>'
+					+'</tr>',
+				html = '';
+			$.ajax({
+				url: '${rc.getContextPath()}/holdStock.do',
+				type: 'get',
+				data:{
+					cusFields: '3,2,4,5,7,6' // 查询字段
+				},
+				dataType: 'json',
+				success: function(res){
+					if(!res.errMsg){
+						// 
+						$.each(res.data, function(i, n){
+							html += tpl.replace(/\$name/, n[0]).replace(/\$code/, n[1])
+									.replace(/\$sum/, n[2]).replace(/\$available/, n[3])
+									.replace(/\$cost/, n[4]).replace(/\$newPrice/, n[5]);
+						});
+						if(html){
+							$('#holding-grid').html(html);
+						}
+					}
+				}
+			});
+			
+		}
+		// 填充买卖5信息
+		function renderBuyAngSellInfo(stockObject){
+			//console.log(stockObject);
+			if(firstTime){
+				firstTime = false;
+				//切换股东账号
+				toggleStockholderAccount(stockObject['market']);
+			}
+			$('#mc').text(stockObject['mc']);
+			
+			for(pro in stockObject){
+				//console.log(pro);
+				if(stockObject.hasOwnProperty(pro) && (pro.indexOf('s')==0 || pro.indexOf('b')==0)){
+					var td = $('#'+pro);
+					if(td.length < 1) continue ;
+					td.text(stockObject[pro]);
+					
+					if(pro.indexOf('Price') !== -1){
+						if((stockObject[pro]-0)<(stockObject['zs']-0)){
+							td.addClass('down').removeClass('up');
+						}else if((stockObject[pro]-0)>(stockObject['zs']-0)){
+							td.addClass('up').removeClass('down');
+						}else{
+							td.removeClass('down up');
+						}
+					}
+				}
+			}
+		}
+		// 抹掉买卖5信息
+		function clearBuyAngSellInfo(){
+			$('.trade-info td').each(function(i){
+				if(i%3 !==0){
+					$(this).text('--');
+				}
+			});
+			$('#availableNum').text('');
+			$('#buyOrSellNum').val('');
+			$('#mc').text('');
+		}
+		function reset(){
+			if(ws){
+				ws.destroy();
+			}
+			clearBuyAngSellInfo();
+			$('#stockCode').val('').trigger('input');
+			
+			
+		}
+		// 初次登陆页面和股票代码为空时，填充所有股东号
+		function initStockholderAccount(){
+			var ophtml = '';
+			for(var i=0; i<stockholderAccount.length; i++){
+				ophtml += '<option jys="'+stockholderAccount[i][1]+'">'+stockholderAccount[i][0]+'</option>';
+			}
+			$('#selectGdh select').html(ophtml);
+			$('#selectGdh select').trigger('change');
+		}
+		
+		// 填充委托方式
+		function initDelegatePriceType(){
+			var ophtml = '';
+			if($('#selectGdh option').length > 0){
+				var selOption = $("#selectGdh option").filter(function(index) {return this.selected});
+				if(selOption.attr("jys").toLowerCase() == 'sh' || selOption.attr("jys").toLowerCase() == 'hb'){
+					for(var i=0; i<arrPriceType[0].length; i++){
+						ophtml += '<option value="'+arrPriceType[0][i].split(':')[1]+'">'+arrPriceType[0][i].split(':')[0]+'</option>';
+					}
+				}
+				else if(selOption.attr("jys").toLowerCase() == 'sz' || selOption.attr("jys").toLowerCase() == 'sb'){
+					for(var i=0; i<arrPriceType[1].length; i++){
+						ophtml += '<option value="'+arrPriceType[1][i].split(':')[1]+'">'+arrPriceType[1][i].split(':')[0]+'</option>';
+					}
+				}
+			}
+			$('#selectPriceType select').html(ophtml);
+		
+		}
+		
+		var Box = {
+			el: $('.out'),
+			layer: $('.overlay'),
+			open: function(param){
+				/*
+					{
+						title: string
+						data: []
+						callback: function
+						mode: string
+					}
+				*/
+				var $el = this.el, liHtml= '', top;
+				$el.find('.box-title').html(param['title']);
+				for(var i=0; i<param.data.length; i++){
+					liHtml += '<li>'+param.data[i]+'</li>'
+				}
+				if(param.warning){
+					liHtml += '<li class="warn">警告：'+param.warning+'</li>'
+				}
+				$el.find('.box-content ul').html(liHtml);
+				if(param.mode == 'confirm' /*&& typeof param.callback === 'function'*/){
+					$('#confirmBox').show();
+					$('#alertBox').hide();
+				}else{
+					$('#confirmBox').hide();
+					$('#alertBox').show();
+				}
+				this.closeCallback = null;
+				if(typeof param.callback === 'function'){
+					this.closeCallback = param.callback;
+				}
+				this.layer.show();
+				$el.show();
+				
+				top = $('body').scrollTop()+($(window).height()- $el.height())*0.5;
+			
+				$el.css('top', top+'px');
+				
+			},
+			close: function(){
+				this.el.hide();
+				this.layer.hide();
+				if(typeof this.closeCallback === 'function'){
+					this.closeCallback();
+				}
+			}
+		}
+		
+		// 初试化函数
+		function initPage(){
+			//获取股东信息
+			getStockholderInfo();
+			// 查资金
+			getAvailableMoney();
+			// 持仓查询
+			holding();
+		}
+		initPage();
+	});
+</script>
+</html>
